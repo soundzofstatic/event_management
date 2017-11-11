@@ -3,19 +3,17 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class Venue {
+public class SeatingType {
 
     private String id;
     private String name;
-    private String streetAddress;
-    private String locality;
-    private String region;
-    private String country;
-    private String zipCode;
-    private int capacity;
-    private int[] typeOfSeating;
+    private int maxCapacityVIP;
+    private int maxCapacityRegular;
+    private int floors;
+    private String shape;
+    private int[] seatMap;
 
-    private static final String DEFAULT_VENUE_FILE = "src/venues.csv";
+    private static final String DEFAULT_VENUE_FILE = "src/seating_types.csv";
 
     /**
      * Venue constructor that takes a Venue UUID string and name and implicitly reads data from venue file and set object fields
@@ -23,7 +21,7 @@ public class Venue {
      * @param id
      * @param name
      */
-    public Venue(String id, String name){
+    public SeatingType(String id, String name){
 
         this.id = id;
         this.name = name;
@@ -40,29 +38,25 @@ public class Venue {
     }
 
     /**
-     * Venue constructor used to accept client code definitions for a venue and implicitly writes data to a file
+     * SeatingType constructor used to accept client code definitions for seating type and implicitly writes data to a file
      *
      * @param name
-     * @param streetAddress
-     * @param locality
-     * @param region
-     * @param country
-     * @param zipCode
-     * @param capacity
-     * @param typeOfSeating
+     * @param maxCapacityVIP
+     * @param maxCapacityRegular
+     * @param floors
+     * @param shape
+     * @param seatMap
      */
-    public Venue(String name, String streetAddress, String locality, String region, String country, String zipCode, int capacity, int[] typeOfSeating)
+    public SeatingType(String name, int maxCapacityVIP, int maxCapacityRegular, int floors, String shape, int[] seatMap)
     {
 
         // Set all of the object fields
         this.name = name;
-        this.streetAddress = streetAddress;
-        this.locality = locality;
-        this.region = region;
-        this.country = country;
-        this.zipCode = zipCode;
-        this.capacity = capacity;
-        this.typeOfSeating = typeOfSeating;
+        this.maxCapacityVIP = maxCapacityVIP;
+        this.maxCapacityRegular = maxCapacityRegular;
+        this.floors = floors;
+        this.shape = shape;
+        this.seatMap = seatMap;
 
         // Write to File
         try {
@@ -108,123 +102,57 @@ public class Venue {
     }
 
     /**
-     * Public Getter method that returns value of this.streetAddress
-     * @return String
-     */
-    public String getStreetAddress()
-    {
-
-        return this.streetAddress;
-
-    }
-
-    /**
-     * Public Getter method that returns value of this.locality
-     * @return String
-     */
-    public String getLocality()
-    {
-
-        return this.locality;
-
-    }
-
-    /**
-     * Public Getter method that returns value of this.region
-     * @return String
-     */
-    public String getRegion()
-    {
-
-        return this.region;
-
-    }
-
-    /**
-     * Public Getter method that returns value of this.country
-     * @return String
-     */
-    public String getCountry()
-    {
-
-        return this.country;
-
-    }
-
-    /**
-     * Public Getter method that returns value of this.zipCode
-     * @return String
-     */
-    public String getZipCode()
-    {
-
-        return this.zipCode;
-
-    }
-
-    /**
-     * Public Getter method that returns value of this.capacity
+     * Public Getter method that returns value of this.maxCapacityVIP
      * @return int
      */
-    public int getCapacity()
+    public int getMaxCapacityVIP()
     {
 
-        return this.capacity;
+        return this.maxCapacityVIP;
 
     }
 
     /**
-     * Public Getter method that returns value of this.typeOfSeating
-     * @return int[]
+     * Public Getter method that returns value of this.maxCapacityRegular
+     * @return int
      */
-    public int[] getTypeOfSeating()
+    public int getMaxCapacityRegular()
     {
 
-        return this.typeOfSeating;
+        return this.maxCapacityRegular;
 
     }
 
     /**
-     * Public method that returns a full address
-     *
+     * Public Getter method that returns value of this.floors
+     * @return int
+     */
+    public int getFloors()
+    {
+
+        return this.floors;
+
+    }
+
+    /**
+     * Public Getter method that returns value of this.shape
      * @return String
      */
-    public String getAddress()
+    public String getShape()
     {
 
-        String address = "";
+        return this.shape;
 
-        if(this.streetAddress != null){
+    }
 
-            address += " " + this.streetAddress;
+    /**
+     * Public Getter method that returns value of this.seatMap
+     * @return int[]
+     */
+    public int[] getSeatMap()
+    {
 
-        }
-
-        if(this.locality != null){
-
-            address += " " + this.locality;
-
-        }
-
-        if(this.region != null){
-
-            address += ", " + this.region;
-
-        }
-
-        if(this.country != null){
-
-            address += " " + this.country;
-
-        }
-
-        if(this.zipCode != null){
-
-            address += " " + this.zipCode;
-
-        }
-
-        return address;
+        return this.seatMap;
 
     }
 
@@ -242,7 +170,7 @@ public class Venue {
         this.id = uuid.toString();
 
         // Create the String that represents a record
-        String record = "\"" + id + "\",\"" + name + "\",\"" + streetAddress + "\",\"" + locality + "\",\"" + region + "\",\"" + country + "\",\"" + zipCode + "\",\"" + capacity + "\",\"" + Arrays.toString(typeOfSeating) + "\"";
+        String record = "\"" + id + "\",\"" + name + "\",\"" + maxCapacityVIP + "\",\"" + maxCapacityRegular + "\",\"" + floors + "\",\"" + shape + "\",\"" + Arrays.toString(seatMap) + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -292,7 +220,7 @@ public class Venue {
             // Skip records that don't have matching id
             if(this.id != null && !recordArray[0].toLowerCase().equals(this.id.toLowerCase())) {
 
-               continue;
+                continue;
 
             }
 
@@ -302,8 +230,6 @@ public class Venue {
                 continue;
 
             }
-
-            System.out.println(Arrays.toString(recordArray));
 
             // Iterate over elements and map to object fields
             for(int i = 0; i < recordArray.length; i++){
@@ -315,28 +241,20 @@ public class Venue {
                         this.name = recordArray[i];
                         break;
                     case 2:
-                        this.streetAddress = recordArray[i];
+                        this.maxCapacityVIP = Integer.parseInt(recordArray[i]);
                         break;
                     case 3:
-                        this.locality = recordArray[i];
+                        this.maxCapacityRegular = Integer.parseInt(recordArray[i]);
                         break;
                     case 4:
-                        this.region = recordArray[i];
+                        this.floors = Integer.parseInt(recordArray[i]);
                         break;
                     case 5:
-                        this.country = recordArray[i];
+                        this.shape = recordArray[i];
                         break;
                     case 6:
-                        this.zipCode = recordArray[i];
-                        break;
-                    case 7:
-                        System.out.println(recordArray[i]);
-                        this.capacity = Integer.parseInt(recordArray[i]);
-                        break;
-                    case 8:
-                        System.out.println(recordArray[i]);
                         int[] seatMap = {1, 2, 3};
-                        this.typeOfSeating = seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
+                        this.seatMap = seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
                         break;
                 }
             }
@@ -375,7 +293,7 @@ public class Venue {
 
                     if(recordArray[i].toLowerCase().substring(1, (recordArray[i].length() - 1)).equals(this.id.toLowerCase())){
 
-                        System.out.println("Duplicate Venue ID.");
+                        System.out.println("Duplicate SeatingType ID.");
 
                         return true;
 
@@ -387,7 +305,7 @@ public class Venue {
 
                     if(recordArray[i].toLowerCase().substring(1, (recordArray[i].length() - 1)).equals(this.name.toLowerCase())){
 
-                        System.out.println("Duplicate Venue Name.");
+                        System.out.println("Duplicate SeatingType Name.");
 
                         return true;
 
