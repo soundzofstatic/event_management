@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class SeatingType {
     private int maxCapacityRegular;
     private int floors;
     private String shape;
-    private int[] seatMap;
+    private String[][][] seatMap;
 
     private static final String DEFAULT_VENUE_FILE = "src/seating_types.csv";
 
@@ -47,7 +48,7 @@ public class SeatingType {
      * @param shape
      * @param seatMap
      */
-    public SeatingType(String name, int maxCapacityVIP, int maxCapacityRegular, int floors, String shape, int[] seatMap)
+    public SeatingType(String name, int maxCapacityVIP, int maxCapacityRegular, int floors, String shape, String[][][] seatMap)
     {
 
         // Set all of the object fields
@@ -149,7 +150,7 @@ public class SeatingType {
      * Public Getter method that returns value of this.seatMap
      * @return int[]
      */
-    public int[] getSeatMap()
+    public String[][][] getSeatMap()
     {
 
         return this.seatMap;
@@ -170,7 +171,7 @@ public class SeatingType {
         this.id = uuid.toString();
 
         // Create the String that represents a record
-        String record = "\"" + id + "\",\"" + name + "\",\"" + maxCapacityVIP + "\",\"" + maxCapacityRegular + "\",\"" + floors + "\",\"" + shape + "\",\"" + Arrays.toString(seatMap) + "\"";
+        String record = "\"" + id + "\",\"" + name + "\",\"" + maxCapacityVIP + "\",\"" + maxCapacityRegular + "\",\"" + floors + "\",\"" + shape + "\",\"" + Arrays.deepToString(seatMap) + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -253,8 +254,8 @@ public class SeatingType {
                         this.shape = recordArray[i];
                         break;
                     case 6:
-                        int[] seatMap = {1, 2, 3};
-                        this.seatMap = seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
+                        //String[][][] seatMap = {{{"unsold", "regular"}, {"unsold", "regular"}}, {{"unsold", "regular"}, {"unsold", "regular"}}};
+                        this.seatMap =  convertStringtoArray(recordArray[i]);//seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
                         break;
                 }
             }
@@ -264,6 +265,126 @@ public class SeatingType {
         }
 
     }
+
+    private String[][][] convertStringtoArray(String stringArray)
+    {
+
+        String[][][] sampleStringArray = new String[][][] {{{"unsold", "regular"}, {"unsold", "regular"}}, {{"unsold", "regular"}, {"unsold", "regular"}}};
+
+        // todo - Overridden during testing
+        stringArray = Arrays.deepToString(sampleStringArray);
+
+        String arrayStringStructure = "";
+
+        ArrayList dimensions = new ArrayList();
+        ArrayList valuesArray = new ArrayList();
+
+        int openBracket = 0;
+
+        int lastArrayStart = -1;
+
+        String values = "";
+
+
+        for(int i = 0; i < stringArray.length();i++){
+
+            if(stringArray.charAt(i) != '[' && stringArray.charAt(i) != ']' && stringArray.charAt(i) != ','){
+
+                //openBracket += 1;
+                values += stringArray.charAt(i);
+
+            } else {
+
+                arrayStringStructure += stringArray.charAt(i);
+
+                // An array has started
+                if(stringArray.charAt(i) == '['){
+
+                    lastArrayStart++;
+
+                    // Reset the values variable
+                    values = "";
+
+                    if(dimensions.contains(lastArrayStart)){
+
+                        //System.out.println("Already in ArrayList: " + lastArrayStart);
+
+                    } else {
+
+                        //System.out.println("Not in ArrayList: " + lastArrayStart);
+                        dimensions.add(lastArrayStart, lastArrayStart);
+
+                    }
+
+                    System.out.println("Opened at: " + lastArrayStart);
+
+                } else if(stringArray.charAt(i) == ']'){
+
+                    // Report the value up to date
+                    System.out.println(values);
+
+                    System.out.println("Closed at: " + lastArrayStart);
+
+                    if(!values.equals("")) {
+                        int indexToUse = (valuesArray.size() - 1);
+                        if (indexToUse < 0){
+                            indexToUse = 0;
+                        }
+
+                        String[] splitString = values.split(" ");
+
+                        // Array
+                        ArrayList arr = new ArrayList();
+                        for(int j =0; j < splitString.length; j++){
+
+                            arr.add(splitString[j]);
+
+                        }
+                        valuesArray.add(arr);
+                    }
+
+                    // now Reset values since a new element is starting
+                    values = "";
+
+                    lastArrayStart--;
+
+                } /*else if(stringArray.charAt(i) == ','){
+
+                    // Report the values variable in its current state
+                    System.out.println(values);
+
+                    System.out.println("Continues at: " + lastArrayStart);
+
+                    if(!values.equals("")) {
+
+                        int indexToUse = (valuesArray.size() - 1);
+                        if (indexToUse < 0){
+                            indexToUse = 0;
+                        }
+                        valuesArray.add(indexToUse, values);
+                    }
+
+                    // now Reset values since a new element is starting
+                    values = "";
+
+                }*/
+
+            }
+
+        }
+
+        System.out.println("Open Brackets: " + openBracket);
+        System.out.println("Array String Structure: " + arrayStringStructure);
+        System.out.println("Array String Value: " + values);
+        System.out.println("Dimensions in Structure: " + dimensions);
+        System.out.println("Values in Structure: " + valuesArray);
+
+
+
+        return sampleStringArray;
+
+    }
+
 
     /**
      * Helper method used to check for duplicate records in our "database" file.

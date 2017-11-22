@@ -75,13 +75,17 @@ public class Venue {
     }
 
     /**
+     * Formatted as a USPS valid address
      *
      * @return String
      */
     public String toString() {
 
-        // todo - define
-        return "Todo - DEFINE how this should output";
+        String address =  this.streetAddress + "\n";
+        address += this.locality + ", " + this.region + " " + this.zipCode + "\n";
+        address += this.country + "\n";
+
+        return address;
 
     }
 
