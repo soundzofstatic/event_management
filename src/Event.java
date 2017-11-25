@@ -54,16 +54,18 @@ public class Event {
      * @param capacity
      */
 
-    public Event(String eventType, String venue, String artistName, String datetime, int ticketAvailability, int capacity) {
+    public Event(String title, String venueID, String seatID, int vipAvailability, int regTixAvailability, String artistName, String datetime) {
 
         // Set all of the object fields
-        //this.eventType = eventType;
-        this.venue = null;
-        this.seatingType = null;
+        this.title = title;
+        this.venueID = venueID;
+        this.seatID = seatID;
+        this.vipAvailability = vipAvailability;
+        this.regTixAvailability = regTixAvailability;
         this.artistName = artistName;
         this.datetime = datetime;
-        //this.ticketAvailability = ticketAvailability;
-        //this.capacity = capacity;
+        this.timestamp = 0;
+
 
         // Write to File
         try {
@@ -186,8 +188,7 @@ public class Event {
         this.id = uuid.toString();
 
         // Create the String that represents a record
-        String record = "\"" + id;
-        //String record = "\"" + id + "\",\"" + name + "\",\"" + streetAddress + "\",\"" + locality + "\",\"" + region + "\",\"" + country + "\",\"" + zipCode + "\",\"" + capacity + "\",\"" + Arrays.toString(typeOfSeating) + "\"";
+        String record = "\"" + id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatID + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -311,32 +312,19 @@ public class Event {
             String[] recordArray = record.split(",");
 
             // Iterate over the first two elements of the array (expected to be id and name, respectively)
-            for(int i=0; i < 2; i++){
+            for(int i=0; i < 1; i++){
 
                 if(i == 0){// if id
 
                     if(recordArray[i].toLowerCase().substring(1, (recordArray[i].length() - 1)).equals(this.id.toLowerCase())){
 
-                        System.out.println("Duplicate Venue ID.");
+                        System.out.println("Duplicate Event ID.");
 
                         return true;
 
                     }
 
                 }
-
-                if(i == 1){//if name
-
-                    if(recordArray[i].toLowerCase().substring(1, (recordArray[i].length() - 1)).equals(this.title.toLowerCase())){
-
-                        System.out.println("Duplicate Venue Name.");
-
-                        return true;
-
-                    }
-
-                }
-
             }
 
         }
