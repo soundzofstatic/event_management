@@ -12,7 +12,7 @@ public class SeatingType {
     private int maxCapacityRegular;
     private int floors;
     private String shape;
-    private String[][][] seatMap;
+    private ArrayList<Row> seatMap;
 
     private static final String DEFAULT_VENUE_FILE = "src/seating_types.csv";
 
@@ -46,9 +46,8 @@ public class SeatingType {
      * @param maxCapacityRegular
      * @param floors
      * @param shape
-     * @param seatMap
      */
-    public SeatingType(String name, int maxCapacityVIP, int maxCapacityRegular, int floors, String shape, String[][][] seatMap)
+    public SeatingType(String name, int maxCapacityVIP, int maxCapacityRegular, int floors, String shape, int rows, int seats, int vipRowStart)
     {
 
         // Set all of the object fields
@@ -57,14 +56,18 @@ public class SeatingType {
         this.maxCapacityRegular = maxCapacityRegular;
         this.floors = floors;
         this.shape = shape;
-        this.seatMap = seatMap;
+        this.seatMap = constructArrayListSeatmap(rows, seats, vipRowStart);
 
         // Write to File
         try {
+
             createRecord();
+
         } catch (FileNotFoundException e1) {
+
             // Catch block
             System.out.println("File not Found");
+
         }
 
     }
@@ -125,7 +128,7 @@ public class SeatingType {
     }
 
     /**
-     * Public Getter method that returns value of this.floors
+     * Public Getter method that returns value of this.floors (int)
      * @return int
      */
     public int getFloors()
@@ -136,7 +139,7 @@ public class SeatingType {
     }
 
     /**
-     * Public Getter method that returns value of this.shape
+     * Public Getter method that returns value of this.shape (String)
      * @return String
      */
     public String getShape()
@@ -147,10 +150,10 @@ public class SeatingType {
     }
 
     /**
-     * Public Getter method that returns value of this.seatMap
-     * @return int[]
+     * Public Getter method that returns the vlaue of this.SeatMap (ArrayList of Row Objects)
+     * @return
      */
-    public String[][][] getSeatMap()
+    public ArrayList<Row> getSeatMap()
     {
 
         return this.seatMap;
@@ -171,7 +174,7 @@ public class SeatingType {
         this.id = uuid.toString();
 
         // Create the String that represents a record
-        String record = "\"" + id + "\",\"" + name + "\",\"" + maxCapacityVIP + "\",\"" + maxCapacityRegular + "\",\"" + floors + "\",\"" + shape + "\",\"" + Arrays.deepToString(seatMap) + "\"";
+        String record = "\"" + id + "\",\"" + name + "\",\"" + maxCapacityVIP + "\",\"" + maxCapacityRegular + "\",\"" + floors + "\",\"" + shape + "\",\"" + arrayListSeatmapToString(seatMap) + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -255,7 +258,7 @@ public class SeatingType {
                         break;
                     case 6:
                         //String[][][] seatMap = {{{"unsold", "regular"}, {"unsold", "regular"}}, {{"unsold", "regular"}, {"unsold", "regular"}}};
-                        this.seatMap =  convertStringtoArray(recordArray[i]);//seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
+                        this.seatMap =  convertStringtoArrayList(recordArray[i]);//seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
                         break;
                 }
             }
@@ -266,125 +269,161 @@ public class SeatingType {
 
     }
 
-    private String[][][] convertStringtoArray(String stringArray)
+    /**
+     * Private method used to convert a string representation of a multidimensional array to an ArrayList of Row objects
+     *
+     * @param stringArray
+     * @return
+     */
+    private ArrayList<Row> convertStringtoArrayList(String stringArray)
     {
+        // Integer augmentor used to keep track at what level in the multidim array we are in
+        int groupLevel = -1;
 
-        String[][][] sampleStringArray = new String[][][] {{{"unsold", "regular"}, {"unsold", "regular"}}, {{"unsold", "regular"}, {"unsold", "regular"}}};
-
-        // todo - Overridden during testing
-        stringArray = Arrays.deepToString(sampleStringArray);
-
-        String arrayStringStructure = "";
-
-        ArrayList dimensions = new ArrayList();
-        ArrayList valuesArray = new ArrayList();
-
-        int openBracket = 0;
-
-        int lastArrayStart = -1;
-
+        // String used to hold inner values of a seat array
         String values = "";
 
+        // Array storing Row objects
+        ArrayList<Row> seatLayout = new ArrayList<>();
 
         for(int i = 0; i < stringArray.length();i++){
 
             if(stringArray.charAt(i) != '[' && stringArray.charAt(i) != ']' && stringArray.charAt(i) != ','){
 
-                //openBracket += 1;
                 values += stringArray.charAt(i);
 
             } else {
 
-                arrayStringStructure += stringArray.charAt(i);
-
                 // An array has started
                 if(stringArray.charAt(i) == '['){
 
-                    lastArrayStart++;
+                    // Increment since we are within another (nested) group
+                    groupLevel++;
 
                     // Reset the values variable
                     values = "";
 
-                    if(dimensions.contains(lastArrayStart)){
+                    // Open (append) a new Row to seatLayout
+                    if(groupLevel == 1){
 
-                        //System.out.println("Already in ArrayList: " + lastArrayStart);
-
-                    } else {
-
-                        //System.out.println("Not in ArrayList: " + lastArrayStart);
-                        dimensions.add(lastArrayStart, lastArrayStart);
+                        // Create a new Row object and append it to the seatLayout
+                        seatLayout.add(new Row());
 
                     }
-
-                    System.out.println("Opened at: " + lastArrayStart);
 
                 } else if(stringArray.charAt(i) == ']'){
 
-                    // Report the value up to date
-                    System.out.println(values);
-
-                    System.out.println("Closed at: " + lastArrayStart);
-
-                    if(!values.equals("")) {
-                        int indexToUse = (valuesArray.size() - 1);
-                        if (indexToUse < 0){
-                            indexToUse = 0;
-                        }
-
-                        String[] splitString = values.split(" ");
-
-                        // Array
-                        ArrayList arr = new ArrayList();
-                        for(int j =0; j < splitString.length; j++){
-
-                            arr.add(splitString[j]);
-
-                        }
-                        valuesArray.add(arr);
-                    }
-
-                    // now Reset values since a new element is starting
-                    values = "";
-
-                    lastArrayStart--;
-
-                } /*else if(stringArray.charAt(i) == ','){
-
-                    // Report the values variable in its current state
-                    System.out.println(values);
-
-                    System.out.println("Continues at: " + lastArrayStart);
-
+                    // Check if the values up to this point only equal blank (in the case of between nested arrays ie. [], [])
                     if(!values.equals("")) {
 
-                        int indexToUse = (valuesArray.size() - 1);
-                        if (indexToUse < 0){
-                            indexToUse = 0;
-                        }
-                        valuesArray.add(indexToUse, values);
+                        // Split properties for Seat which are separated by \s at this point
+                        // todo - Note: if a single seat attribute is multi word, this will bug out
+                        String[] seatProperties = values.split(" ");
+
+                        // Get the last element of seatLayout, which is a Row Object
+                        Row currentRow = seatLayout.get((seatLayout.size() - 1));
+
+                        // Create a new Seat and set it to the last row object in the seatLayout
+                        currentRow.addSeat(new Seat(seatProperties[0], seatProperties[1], seatProperties[2]));
+
                     }
 
-                    // now Reset values since a new element is starting
+                    // now Reset values variable since it has already been logged to the row
                     values = "";
 
-                }*/
+                    // Decrement to step out of this group
+                    groupLevel--;
+
+                }
 
             }
 
         }
 
-        System.out.println("Open Brackets: " + openBracket);
-        System.out.println("Array String Structure: " + arrayStringStructure);
-        System.out.println("Array String Value: " + values);
-        System.out.println("Dimensions in Structure: " + dimensions);
-        System.out.println("Values in Structure: " + valuesArray);
-
-
-
-        return sampleStringArray;
+        return seatLayout;
 
     }
 
+    /**
+     * Private method that is used to iterate over an ArrayList of Row objects and convert them to arrays
+     * in order to flatten the arrays out using .toString so we can write a full String representation of the
+     * array to file
+     *
+     * @param seatLayout
+     * @return
+     */
+    private String arrayListSeatmapToString(ArrayList<Row> seatLayout)
+    {
+
+        // Initialize a general ArrayList to be used to keep Rows in String Array format
+        ArrayList dynamicRowArray = new ArrayList();
+
+        // Iterate over each Row in seatLayout
+        for(int i = 0; i < seatLayout.size(); i++){
+
+            // Initialize general ArrayList to be used to keep Seats in String Array format
+            ArrayList dynamicSeatArray = new ArrayList();
+
+            // Get the Current row as an object of type Row
+            Row currentRow = seatLayout.get(i);
+
+            // Get the Seats for the row as an ArrayList<Seat>
+            ArrayList<Seat> seats = currentRow.getSeats();
+
+            // Iterate over the seats (seat objects)
+            for(int j = 0; j < seats.size(); j++){
+
+                // Get the Current seat as an object of type Seat
+                Seat currentSeat = seats.get(j);
+
+                // Add the currentSeat's to the general dynamicSeatArray as String[]
+                dynamicSeatArray.add(new String[]{currentSeat.getId(), currentSeat.getSold(), currentSeat.getTier()});
+
+            }
+
+            // Add the dynamicSeatArray String[] to the array, but use the String Representation of the array
+            dynamicRowArray.add(Arrays.deepToString(dynamicSeatArray.toArray()));
+
+        }
+
+        // Return
+        return Arrays.deepToString(dynamicRowArray.toArray());
+
+    }
+
+    /**
+     * Private method used to construct an ArrayList of Row object based on row and seat specifications
+     *
+     * @param rows
+     * @param seats
+     * @param vipRowStart
+     * @return
+     */
+    private ArrayList<Row> constructArrayListSeatmap(int rows, int seats, int vipRowStart)
+    {
+
+        // Array storing Row objects
+        ArrayList<Row> seatLayout = new ArrayList<>();
+
+        // Iterate over Rows
+        for(int i = 0; i < rows; i++){
+
+            // Create a new Row object and append it to the seatLayout
+            seatLayout.add(new Row());
+
+            // Iterate over Seats
+            for(int j=0; j < seats; j++){
+
+                // Create a new Seat and set it to the last row object in the seatLayout
+                seatLayout.get((seatLayout.size() - 1)).addSeat(new Seat());
+
+            }
+
+        }
+
+        return seatLayout;
+
+    }
 
     /**
      * Helper method used to check for duplicate records in our "database" file.
