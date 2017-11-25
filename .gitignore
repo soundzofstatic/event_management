@@ -26,3 +26,9 @@ out/*
 
 # Intelij settings folder
 .idea/*
+
+# CSV Files
+*.csv
+
+# Files/Folders that are prefixed with double underscore "__"
+__*
