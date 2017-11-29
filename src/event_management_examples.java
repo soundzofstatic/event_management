@@ -5,13 +5,39 @@ public class event_management_examples {
 
     public static void main(String[] args){
 
-        exampleCreateVenue();
+        // exampleCreateEvent("KNOWN_VENUE_ID_HERE", "KNOWN_SEATING_ID_HERE");
 
-        //exampleQueryVenue("SPECIFY_ID_HERE");
+        // exampleQueryEvent("KNOWN_EVENT_ID_HERE");
 
-        exampleCreateSeatingType();
+        // exampleCreateVenue();
 
-        //exampleQuerySeatingType("SPECIFY_ID_HERE");
+        // exampleQueryVenue("SPECIFY_ID_HERE");
+
+        // exampleCreateSeatingType();
+
+        // exampleQuerySeatingType("SPECIFY_ID_HERE");
+
+    }
+
+    public static void exampleCreateEvent(String venueID, String seatingID)
+    {
+      Event newEvent = new Event("An Event Title", venueID, seatingID, 10, 90, "JamBand", "12/12/2017 20:00:00");
+
+    }
+
+    public static void exampleQueryEvent(String eventID)
+    {
+        Event newEvent = new Event(eventID, null);
+        System.out.println("Title: " + newEvent.getTitle());
+        System.out.println("VenueID: " + newEvent.getVenueID());
+        System.out.println("Venue Obj: " + newEvent.getVenue());
+        System.out.println("SeatingTypeID: " + newEvent.getSeatingTypeID());
+        System.out.println("SeatingType Obj: " + newEvent.getSeatingType());
+        System.out.println("RegTixAvailability: " + newEvent.getRegTixAvailability());
+        System.out.println("VipTixAvailability: " + newEvent.getVipTicketAvailability());
+        System.out.println("ArtistName: " + newEvent.getArtistName());
+        System.out.println("Datetime: " + newEvent.getDatetime());
+        System.out.println("Timestamp: " + newEvent.getTimestamp());
 
     }
 

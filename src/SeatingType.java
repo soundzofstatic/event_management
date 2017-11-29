@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 
+/**
+ * DESCRIPTION
+ *
+ * @author Daniel Paz
+ * @version 1.0
+ */
 public class SeatingType {
 
     private String id;

@@ -1,5 +1,11 @@
 import java.util.ArrayList;
 
+/**
+ * DESCRIPTION
+ *
+ * @author Daniel Paz
+ * @version 1.0
+ */
 public class Row {
 
     int seatCount;

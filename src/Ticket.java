@@ -2,7 +2,12 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
-
+/**
+ * DESCRIPTION
+ *
+ * @author Scott Chaplinksi
+ * @version 1.0
+ */
 public class Ticket {
 
     private float price;

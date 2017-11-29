@@ -1,4 +1,10 @@
 import java.util.UUID;
+/**
+ * DESCRIPTION
+ *
+ * @author Daniel Paz
+ * @version 1.0
+ */
 public class Seat {
 
     private String id;

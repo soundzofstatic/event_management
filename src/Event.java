@@ -1,22 +1,31 @@
 import java.io.*;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.Date;
 
+/**
+ * DESCRIPTION
+ *
+ * @author Scott Chaplinksi
+ * @author Daniel Paz
+ * @version 1.0
+ */
 public class Event {
 
     private String id;
     private String title;
     private String venueID;
-    private String seatID;
+    private Venue venue;
+    private String seatingTypeID;
+    private SeatingType seatingType;
 //  private String eventType;
     private int vipAvailability;
     private int regTixAvailability;
-    private Venue venue;
-    private SeatingType seatingType;
     private String artistName;
     private String datetime;
-    private int timestamp;
+    private long timestamp;
     private boolean active;
 
     private static final String DEFAULT_EVENT_FILE = "src/events.csv";
@@ -44,27 +53,35 @@ public class Event {
     }
 
     /**
-     * Venue constructor used to accept client code definitions for a venue and implicitly writes data to a file
+     * Event Constructor used to accept client code definitions for an event and implicitly writes data to a file
      *
-     * @param eventType
-     * @param venue
+     * @param title
+     * @param venueID
+     * @param seatingTypeID
+     * @param vipAvailability
+     * @param regTixAvailability
      * @param artistName
      * @param datetime
-     * @param ticketAvailability
-     * @param capacity
      */
-
-    public Event(String title, String venueID, String seatID, int vipAvailability, int regTixAvailability, String artistName, String datetime) {
+    public Event(String title, String venueID, String seatingTypeID, int vipAvailability, int regTixAvailability, String artistName, String datetime) {
 
         // Set all of the object fields
         this.title = title;
         this.venueID = venueID;
-        this.seatID = seatID;
+        this.seatingTypeID = seatingTypeID;
         this.vipAvailability = vipAvailability;
         this.regTixAvailability = regTixAvailability;
         this.artistName = artistName;
         this.datetime = datetime;
-        this.timestamp = 0;
+        try {
+
+            this.timestamp = convertDatestampToEpoch(datetime);
+
+        } catch (Exception err){
+
+            this.timestamp = 0;
+
+        }
 
 
         // Write to File
@@ -86,7 +103,7 @@ public class Event {
 
     }
 
-    public int getTimestamp() {
+    public Long getTimestamp() {
 
         return this.timestamp;
 
@@ -95,6 +112,16 @@ public class Event {
     public Boolean getActive() {
 
         return this.active;
+
+    }
+
+    /**
+     * Public Getter method that returns value of this.venue
+     *
+     * @return String
+     */
+    public String getVenueID() {
+        return this.venueID;
 
     }
 
@@ -124,8 +151,18 @@ public class Event {
      *
      * @return String
      */
-    public String getSeatID() {
-        SeatingType venueSeating = new SeatingType(this.seatID, null);
+    public String getSeatingTypeID() {
+        return this.seatingTypeID;
+
+    }
+
+    /**
+     * Public Getter method that returns value of this.venue
+     *
+     * @return String
+     */
+    public String getSeatingType() {
+        SeatingType venueSeating = new SeatingType(this.seatingTypeID, null);
         return venueSeating.toString();
 
     }
@@ -188,7 +225,7 @@ public class Event {
         this.id = uuid.toString();
 
         // Create the String that represents a record
-        String record = "\"" + id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatID + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
+        String record = "\"" + id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatingTypeID + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -249,8 +286,6 @@ public class Event {
 
             }
 
-            System.out.println(Arrays.toString(recordArray));
-
             // Iterate over elements and map to object fields
             for(int i = 0; i < recordArray.length; i++){
                 switch(i){
@@ -264,7 +299,7 @@ public class Event {
                         this.venueID = recordArray[i];
                         break;
                     case 3:
-                        this.seatID = recordArray[i];
+                        this.seatingTypeID = recordArray[i];
                         break;
                     case 4:
                         this.vipAvailability = Integer.parseInt(recordArray[i]);
@@ -279,7 +314,7 @@ public class Event {
                         this.datetime = recordArray[i];
                         break;
                     case 8:
-                        this.timestamp = Integer.parseInt(recordArray[i]);
+                        this.timestamp = Long.parseLong(recordArray[i]);
                         break;
                 }
             }
@@ -330,6 +365,31 @@ public class Event {
         }
 
         return false;
+
+    }
+
+    private Long convertDatestampToEpoch(String datetime) throws Exception
+    {
+
+        // Per https://stackoverflow.com/questions/6687433/convert-a-date-format-in-epoch
+
+        // Note: Dattime is expected in the following format
+        // String datetime = "12/15/2017 23:11:52";
+
+        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        Date date = df.parse(datetime);
+        return  date.getTime();
+
+    }
+
+    private String convertEpochToDatestamp(Long epoch)
+    {
+        // Per https://stackoverflow.com/questions/7740972/convert-epoch-time-to-date
+
+        Date date = new Date(epoch);
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        return format.format(date);
 
     }
     

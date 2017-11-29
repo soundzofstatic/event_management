@@ -3,6 +3,12 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
 
+/**
+ * DESCRIPTION
+ *
+ * @author Daniel Paz
+ * @version 1.0
+ */
 public class Venue {
 
     private String id;
@@ -306,8 +312,6 @@ public class Venue {
                 continue;
 
             }
-
-            System.out.println(Arrays.toString(recordArray));
 
             // Iterate over elements and map to object fields
             for(int i = 0; i < recordArray.length; i++){
