@@ -7,6 +7,8 @@ public class event_management_examples {
 
         // exampleCreateEvent("KNOWN_VENUE_ID_HERE", "KNOWN_SEATING_ID_HERE");
 
+        // exampleCreateTicket("KNOWN_EVENT_ID_HERE", "KNOWN_SEAT_ID_HERE");
+
         // exampleQueryEvent("KNOWN_EVENT_ID_HERE");
 
         // exampleCreateVenue();
@@ -38,6 +40,15 @@ public class event_management_examples {
         System.out.println("ArtistName: " + newEvent.getArtistName());
         System.out.println("Datetime: " + newEvent.getDatetime());
         System.out.println("Timestamp: " + newEvent.getTimestamp());
+
+    }
+
+    public static void exampleCreateTicket(String eventID, String seatID)
+    {
+
+        Ticket newTicket = new Ticket(eventID, seatID, 50.00, "General Admission");
+
+        Ticket newTicket1 = new Ticket(eventID, seatID, 75.00, "VIP");
 
     }
 
