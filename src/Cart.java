@@ -18,26 +18,33 @@ import java.util.Scanner;
  */
 
 public class Cart{
+
 	private ArrayList<Ticket> tixList;
-	
-    public Cart(){
-        tixList = new ArrayList<Ticket>();
-	}
-        
-    public ArrayList<Ticket> getTixList(){
-        return tixList;
+
+	public Cart(){
+
+		tixList = new ArrayList<Ticket>();
+
 	}
 
-    public void setTixList(ArrayList<Ticket> newTixList){
-        this.tixList = newTixList;
+	public ArrayList<Ticket> getTixList(){
+
+		return tixList;
+
 	}
 
-    public Boolean add(Ticket newTicket, Event ticketedEvent){
-		Boolean addSuccess = False;
+	public void setTixList(ArrayList<Ticket> newTixList){
+
+		this.tixList = newTixList;
+
+	}
+
+	public Boolean add(Ticket newTicket, Event ticketedEvent){
+		Boolean addSuccess = false;
 		Scanner console = new Scanner(System.in);
 		int input = 2;
 		int quantity = 0;
-		
+
 		System.out.println("Would you like to buy Regular or VIP tickets for " + ticketedEvent.getTitle() + "? (type 1 for Regular tickets, or 2 for VIP.");
 		while (input != 1 && input != 2){
 			input = console.nextInt();
@@ -45,127 +52,132 @@ public class Cart{
 				System.out.println("Invalid entry. Please type 1 for Regular tickets, or 2 for VIP tickets.");
 			}
 		}
-		
+
 		if (input == 1){
-			
-			if ticketedEvent.getRegTixAvailability() == 0{
-				System.out.println("There are no regular tickets left for " + ticketedEvent.getTitle() + ". Please try adding a ticket to the cart again.")
+
+			if (ticketedEvent.getRegTixAvailability() == 0){
+				System.out.println("There are no regular tickets left for " + ticketedEvent.getTitle() + ". Please try adding a ticket to the cart again.");
 				return addSuccess;
 			}
-			
-			do{System.out.print("How many Regular tickets would you like to buy? There are only " + ticketedEvent.getRegTixAvailability() + " regular tickets left for " + ticketedEvent.getTitle() + ".");
-			int quantity = console.nextInt();
-			}while(quantity <= ticketedEvent.getRegTixAvailability() && quantity > 0);
-			
+
+			do{
+				System.out.print("How many Regular tickets would you like to buy? There are only " + ticketedEvent.getRegTixAvailability() + " regular tickets left for " + ticketedEvent.getTitle() + ".");
+				int quantity = console.nextInt();
+			} while(quantity <= ticketedEvent.getRegTixAvailability() && quantity > 0);
+
 			for (x=0; x < quantity; x++){
 				tixList.add(new Ticket(ticketedEvent.getEventID(), ticketedEvent.getSeatID(), 2.00, "Regular"));
 				ticketedEvent.setRegTixAvailability((ticketedEvent.getRegTixAvailability()) - 1);
 			}
-			System.out.println(quantity + " Regular tickets added to cart.");     
-			
-			addSuccess = True;
+			System.out.println(quantity + " Regular tickets added to cart.");
+
+			addSuccess = true;
 			return addSuccess;
+
 		}
-		else{
-			
-			if ticketedEvent.getVipTicketAvailability() == 0{
-				System.out.println("There are no VIP tickets left for " + ticketedEvent.getTitle() + ". Please try adding a ticket to the cart again.")
+		else {
+
+			if (ticketedEvent.getVipTicketAvailability() == 0) {
+				System.out.println("There are no VIP tickets left for " + ticketedEvent.getTitle() + ". Please try adding a ticket to the cart again.");
 				return addSuccess;
 			}
-			
+
 			do{System.out.print("How many VIP tickets would you like to buy? There are only " + ticketedEvent.getVipTicketAvailability() + " VIP tickets left for " + ticketedEvent.getTitle() + ".");
-			quantity = console.nextInt();
+				quantity = console.nextInt();
 			}while(quantity <= ticketedEvent.getVipTicketAvailability() && quantity > 0);
-			
+
 			for (x=0; x < quantity; x++){
 				tixList.add(new Ticket(ticketedEvent.getEventID(), ticketedEvent.getSeatID(), 4.00, "VIP"));
 				ticketedEvent.setVipTicketAvailability((ticketedEvent.getVipTicketAvailability()) - 1);
 			}
-			System.out.println(quantity + " VIP tickets added to cart.");     
-			
-			addSuccess = True;
+			System.out.println(quantity + " VIP tickets added to cart.");
+
+			addSuccess = true;
 			return addSuccess;
 		}
 	}
 
-    public Boolean remove(int ticketIndex){
+	public Boolean remove(int ticketIndex){
+
 		Scanner console = new Scanner(System.in);
-		Boolean removeSuccess = False;
-		
+		Boolean removeSuccess = false;
+
 		if (ticketIndex < 0 || ticketIndex >= tixList.length()){
+
 			System.out.println("The selected ticket does not exist in the cart. Please try again.");
 			return removeSuccess;
+
 		}
-		
+
 		Ticket ticketRemoved = tixList.get(ticketIndex);
 		System.out.print("How many " + ticketRemoved.getTier() + " tickets for " ticketRemoved.getEvent().getTitle() + " would you like to remove?: ");
-        int quantity = console.nextInt();
+		int quantity = console.nextInt();
 		System.out.println("");
 		while(quantity <= 0 || quantity > ticketRemoved.getQuantity()){
 			System.out.println("Invalid number. Please enter a number between 0 and " + ticketRemoved.getQuantity() + ": ");
 			quantity = console.nextInt();
 			System.out.println("");
 		}
-		
+
 		if (quantity == ticketRemoved.getQuantity()){
 			tixList.remove(ticketIndex);
 		}
-		else{
+		else {
 			ticketRemoved.setQuantity(ticketRemoved.getQuantity() - quantity);
-			if ticketRemoved.getTier().equals("Regular"){
+			if (ticketRemoved.getTier().equals("Regular")){
 				ticketRemoved.getEvent().setRegTixAvailability((ticketRemoved.getEvent().getRegTixAvailability) + quantity);
 			}
 			else{
 				ticketRemoved.getEvent().setVipTicketAvailability((ticketRemoved.getEvent().getVipTicketAvailability) + quantity);
 			}
-			
-			System.out.println (ticketRemoved.getQuantity()) + " " + ticketRemoved.getTier() + " tickets for " + ticketRemoved.getEvent() + " removed from cart.");
+
+			System.out.println(ticketRemoved.getQuantity() + " " + ticketRemoved.getTier() + " tickets for " + ticketRemoved.getEvent() + " removed from cart.");
 		}
-		removeSuccess = True;
+		removeSuccess = true;
 		return removeSuccess;
-		}
-		
-                
-    public String toString(){
+	}
+
+
+	public String toString(){
 		double subtotal = 0.0;
 		double tax;
 		double total;
-        String cartString = "Tickets in Cart: \n"
-        for (int i = 0; i < tixList.length(); i++){
-            cartString += (tixList.get(i).getQuantity() + " " + tixList.get(i).getTier() + " tickets for " + tixList.get(i).getEvent() + "\n");
+		String cartString = "Tickets in Cart: \n";
+		for (int i = 0; i < tixList.length(); i++){
+			cartString += (tixList.get(i).getQuantity() + " " + tixList.get(i).getTier() + " tickets for " + tixList.get(i).getEvent() + "\n");
 			subtotal += (tixList.get(i).getPrice() * tixList.get(i).getQuantity());
 		}
 		tax = subtotal * .07;
 		total = subtotal + tax;
-        cartString += ((20 * "-") + "\nSubtotal: $" + String.format("%.2f", subtotal)) + 
-					  ("\n7% Tax: $" + String.format("%.2f", tax)) + 
-					  ("\nTotal: $" + String.format("%.2f", total));
-        return cartString;
+		cartString += ((20 * "-") + "\nSubtotal: $" + String.format("%.2f", subtotal)) +
+				("\n7% Tax: $" + String.format("%.2f", tax)) +
+				("\nTotal: $" + String.format("%.2f", total));
+		return cartString;
 	}
-		
 
-    public Boolean checkout(){
-		Boolean checkoutSuccess = False;
+
+	public Boolean checkout(){
+		Boolean checkoutSuccess = false;
 		Scanner console = new Scanner(System.in);
 		System.out.println(this.toString());
-		
+
 		System.out.print("Would you like to complete your checkout? (enter \"Y\" for yes or \"N\" for no.): ");
-        String checkoutConfirm = console.next().toUpper();
+		String checkoutConfirm = console.next().toUpper();
 		System.out.println("");
-		
-        while (checkoutConfirm != "Y" && checkoutConfirm != "N"):\{
-            print("Please enter \"Y\" for yes, or \"N\" for no.")
-            checkoutConfirm = console.next().toUpper();
+
+		while (checkoutConfirm != "Y" && checkoutConfirm != "N") {
+			System.out.println("Please enter \"Y\" for yes, or \"N\" for no.");
+			checkoutConfirm = console.next().toUpper();
 		}
-        if checkoutConfirm.equals("Y"){
-            System.out.println("Order confirmed. Thank you for shopping with us!");
-            checkoutSuccess = True;
+		if (checkoutConfirm.equals("Y")){
+			System.out.println("Order confirmed. Thank you for shopping with us!");
+			checkoutSuccess = true;
 			return checkoutSuccess;
 		}
         else{
-            System.out.println("Order canceled. Checkout again to confirm your order.");
-            return checkoutSuccess;
+			System.out.println("Order canceled. Checkout again to confirm your order.");
+			return checkoutSuccess;
 		}
 	}
-            
+
 }
