@@ -288,16 +288,8 @@ public class Venue {
 
         while(fileInput.hasNextLine()){
 
-            // read record line
-            String record = fileInput.nextLine();
-
-            // Before exploding, replace problematic characters
-            // todo - consider making the next two lines into it's own helper method
-            String cleanRecord1 = record.replace("\",", "|");
-            String cleanRecord2 = cleanRecord1.replace("\"", "");
-
-            // Explode the Record into individual elements
-            String[] recordArray = cleanRecord2.split("\\|");
+            // Read record line and explode it via ","
+            String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
             // Skip records that don't have matching id
             if(this.id != null && !recordArray[0].toLowerCase().equals(this.id.toLowerCase())) {
@@ -344,7 +336,7 @@ public class Venue {
                     case 8:
                         System.out.println(recordArray[i]);
                         int[] seatMap = {1, 2, 3};
-                        this.typeOfSeating = seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
+                        this.typeOfSeating = seatMap;
                         break;
                 }
             }

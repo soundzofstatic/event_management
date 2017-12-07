@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -6,10 +8,20 @@ public class event_management_examples {
     public static void main(String[] args){
 
         // exampleCreateEvent("KNOWN_VENUE_ID_HERE", "KNOWN_SEATING_ID_HERE");
+        // exampleCreateEvent("160dd9f9-dc60-4408-9c2f-111b912224e3", "286e1967-f208-4dcd-a0fe-a5a02d666986");
 
         // exampleCreateTicket("KNOWN_EVENT_ID_HERE", "KNOWN_SEAT_ID_HERE");
+        // exampleCreateTicket("4b3aa6e0-da82-4b1e-9d6c-e61df386fb67", "d4dd423c-c7f5-4b5f-830f-99141e1cad8c");
+
+        // exampleQueryTicket("KNOWN_TICKET_ID_HERE");
+        // exampleQueryTicket("a8d3208a-11c7-425d-ba97-6729110b01ba");
+        // exampleQueryTicket("test-123");
+
+        // exampleCleanUpTickets();
+
 
         // exampleQueryEvent("KNOWN_EVENT_ID_HERE");
+        //exampleQueryEvent("50883460-1564-42a0-b9a7-354e8b208d16");
 
         // exampleCreateVenue();
 
@@ -23,7 +35,7 @@ public class event_management_examples {
 
     public static void exampleCreateEvent(String venueID, String seatingID)
     {
-      Event newEvent = new Event("An Event Title", venueID, seatingID, 10, 90, "JamBand", "12/12/2017 20:00:00");
+      Event newEvent = new Event("Another Event Title", venueID, seatingID, 10, 90, "CarrotCake", "12/31/2017 23:30:00");
 
     }
 
@@ -40,15 +52,51 @@ public class event_management_examples {
         System.out.println("ArtistName: " + newEvent.getArtistName());
         System.out.println("Datetime: " + newEvent.getDatetime());
         System.out.println("Timestamp: " + newEvent.getTimestamp());
+        System.out.println("Timestamp: " + newEvent.getActive());
+        // todo - System.out.println("Seats Available: " + newEvent.getSeatsAvailable().toString());
+        System.out.println("Seats Sold: " + newEvent.getSeatsSold().toString());
+        System.out.println();
+        System.out.println("Event State");
+        System.out.println(newEvent);
 
     }
 
     public static void exampleCreateTicket(String eventID, String seatID)
     {
 
-        Ticket newTicket = new Ticket(eventID, seatID, 50.00, "General Admission");
+        Ticket newTicket = new Ticket(eventID, seatID + '1', 50.00, "General Admission");
 
-        Ticket newTicket1 = new Ticket(eventID, seatID, 75.00, "VIP");
+        Ticket newTicket1 = new Ticket(eventID, seatID + '2', 75.00, "VIP");
+        newTicket1.setPurchased(true);
+
+    }
+
+    public static void exampleQueryTicket(String TicketID)
+    {
+
+        Ticket tix1 = new Ticket(TicketID);
+        System.out.println(tix1.getId());
+        System.out.println(tix1.getPrice());
+        System.out.println(tix1.getSeatID());
+        System.out.println(tix1.getTier());
+        System.out.println(tix1.getStatus());
+        System.out.println(tix1.getPurchased());
+
+        tix1.setPurchased(true);
+
+    }
+
+    public static void exampleCleanUpTickets()
+    {
+
+        try {
+            Ticket.cleanupDeadTickets();
+
+        } catch (IOException err){
+
+            System.out.println(err);
+
+        }
 
     }
 

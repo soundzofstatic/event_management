@@ -216,16 +216,8 @@ public class SeatingType {
 
         while(fileInput.hasNextLine()){
 
-            // read record line
-            String record = fileInput.nextLine();
-
-            // Before exploding, replace problematic characters
-            // todo - consider making the next two lines into it's own helper method
-            String cleanRecord1 = record.replace("\",", "|");
-            String cleanRecord2 = cleanRecord1.replace("\"", "");
-
-            // Explode the Record into individual elements
-            String[] recordArray = cleanRecord2.split("\\|");
+            // Read record line and explode it via ","
+            String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
             // Skip records that don't have matching id
             if(this.id != null && !recordArray[0].toLowerCase().equals(this.id.toLowerCase())) {
@@ -263,8 +255,7 @@ public class SeatingType {
                         this.shape = recordArray[i];
                         break;
                     case 6:
-                        //String[][][] seatMap = {{{"unsold", "regular"}, {"unsold", "regular"}}, {{"unsold", "regular"}, {"unsold", "regular"}}};
-                        this.seatMap =  convertStringtoArrayList(recordArray[i]);//seatMap;//recordArray[i]; // todo - need algorithm to convert string representation of array (or JSON array), potentially multi-dim array back into an JAVA array
+                        this.seatMap =  convertStringtoArrayList(recordArray[i]);
                         break;
                 }
             }
@@ -330,7 +321,7 @@ public class SeatingType {
                         Row currentRow = seatLayout.get((seatLayout.size() - 1));
 
                         // Create a new Seat and set it to the last row object in the seatLayout
-                        currentRow.addSeat(new Seat(seatProperties[0], seatProperties[1], seatProperties[2]));
+                        currentRow.addSeat(new Seat(seatProperties[0]));
 
                     }
 
@@ -383,7 +374,7 @@ public class SeatingType {
                 Seat currentSeat = seats.get(j);
 
                 // Add the currentSeat's to the general dynamicSeatArray as String[]
-                dynamicSeatArray.add(new String[]{currentSeat.getId(), currentSeat.getSold(), currentSeat.getTier()});
+                dynamicSeatArray.add(new String[]{currentSeat.getId()});
 
             }
 

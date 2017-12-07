@@ -1,6 +1,8 @@
+import javax.rmi.CORBA.Util;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.Date;
@@ -20,9 +22,11 @@ public class Event {
     private Venue venue;
     private String seatingTypeID;
     private SeatingType seatingType;
-//  private String eventType;
+    //  private String eventType;
     private int vipAvailability;
     private int regTixAvailability;
+    private ArrayList<String> seatsAvailable;
+    private ArrayList<String> seatsSold;
     private String artistName;
     private String datetime;
     private long timestamp;
@@ -50,6 +54,16 @@ public class Event {
             System.out.println("File not Found");
         }
 
+        // Set the Venue object
+        fetchVenue();
+
+        // Set the SeatingType object
+        fetchSeatingType();
+
+        // Set the seatsSold and seatsAvailable
+        seatAvailabilityData();
+
+
     }
 
     /**
@@ -65,6 +79,12 @@ public class Event {
      */
     public Event(String title, String venueID, String seatingTypeID, int vipAvailability, int regTixAvailability, String artistName, String datetime) {
 
+        // Generate a UUID ID
+        UUID uuid = UUID.randomUUID();
+
+        // Set the id for the object
+        this.id = uuid.toString();
+
         // Set all of the object fields
         this.title = title;
         this.venueID = venueID;
@@ -75,14 +95,13 @@ public class Event {
         this.datetime = datetime;
         try {
 
-            this.timestamp = convertDatestampToEpoch(datetime);
+            this.timestamp = Utility.convertDatestampToEpoch(datetime);
 
         } catch (Exception err){
 
             this.timestamp = 0;
 
         }
-
 
         // Write to File
         try {
@@ -91,6 +110,16 @@ public class Event {
             // Catch block
             System.out.println("File not Found");
         }
+
+        // Set the Venue object
+        fetchVenue();
+
+        // Set the SeatingType object
+        fetchSeatingType();
+
+        // Set the seatsSold and seatsAvailable
+        seatAvailabilityData();
+
     }
 
     /**
@@ -98,17 +127,30 @@ public class Event {
      */
     public String toString() {
 
-        // todo - define
-        return "Todo - DEFINE how this should output";
+        String state = this.datetime + "\n";
+        state += this.title + " featuring " + this.artistName + "\n";
+        state += this.venue.toString();
+
+        return state;
 
     }
 
+    /**
+     * Public Getter method that returns the value of this.timestamp
+     *
+     * @return
+     */
     public Long getTimestamp() {
 
         return this.timestamp;
 
     }
 
+    /**
+     * Public getter method used to return this.active
+     *
+     * @return
+     */
     public Boolean getActive() {
 
         return this.active;
@@ -121,6 +163,7 @@ public class Event {
      * @return String
      */
     public String getVenueID() {
+
         return this.venueID;
 
     }
@@ -131,8 +174,8 @@ public class Event {
      * @return String
      */
     public String getVenue() {
-        Venue eventVenue = new Venue(this.venueID, null);
-        return eventVenue.toString();
+
+        return this.venue.toString();
 
     }
 
@@ -147,7 +190,7 @@ public class Event {
     }
 
     /**
-     * Public Getter method that returns value of this.venue
+     * Public Getter method that returns value of this.seatingtypeID
      *
      * @return String
      */
@@ -157,13 +200,13 @@ public class Event {
     }
 
     /**
-     * Public Getter method that returns value of this.venue
+     * Public Getter method that returns value of this.seatingType
      *
      * @return String
      */
     public String getSeatingType() {
-        SeatingType venueSeating = new SeatingType(this.seatingTypeID, null);
-        return venueSeating.toString();
+
+        return this.seatingType.toString();
 
     }
 
@@ -212,20 +255,35 @@ public class Event {
     }
 
     /**
+     * Public Getter method that returns value of this.seatsAvailable
+     *
+     * @return
+     */
+    public ArrayList<String> getSeatsAvailable()
+    {
+        return this.seatsAvailable;
+    }
+
+    /**
+     * Public Getter method that returns value of this.seatsSold
+     *
+     * @return
+     */
+    public ArrayList<String> getSeatsSold()
+    {
+        return this.seatsSold;
+    }
+
+    /**
      * Private method used to write object fields to a venues.csv file.
      *
      * @throws FileNotFoundException
      */
     private void createRecord() throws FileNotFoundException
     {
-        // Generate a UUID ID
-        UUID uuid = UUID.randomUUID();
-
-        // Set the id for the object
-        this.id = uuid.toString();
 
         // Create the String that represents a record
-        String record = "\"" + id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatingTypeID + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
+        String record = "\"" + this.id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatingTypeID + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -261,16 +319,8 @@ public class Event {
 
         while(fileInput.hasNextLine()){
 
-            // read record line
-            String record = fileInput.nextLine();
-
-            // Before exploding, replace problematic characters
-            // todo - consider making the next two lines into it's own helper method
-            String cleanRecord1 = record.replace("\",", "|");
-            String cleanRecord2 = cleanRecord1.replace("\"", "");
-
-            // Explode the Record into individual elements
-            String[] recordArray = cleanRecord2.split("\\|");
+            // Read record line and explode it via ","
+            String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
             // Skip records that don't have matching id
             if(this.id != null && !recordArray[0].toLowerCase().equals(this.id.toLowerCase())) {
@@ -368,29 +418,44 @@ public class Event {
 
     }
 
-    private Long convertDatestampToEpoch(String datetime) throws Exception
+    /**
+     * Public method used to set/update the seatsSold and seatsAvailable properties
+     */
+    public void seatAvailabilityData()
     {
 
-        // Per https://stackoverflow.com/questions/6687433/convert-a-date-format-in-epoch
+        // Check for Seats Sold
+        try {
 
-        // Note: Dattime is expected in the following format
-        // String datetime = "12/15/2017 23:11:52";
+            this.seatsSold = Ticket.seatSold(this.id);
 
-        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-        Date date = df.parse(datetime);
-        return  date.getTime();
+        } catch (FileNotFoundException err) {
+
+            this.seatsSold = null;
+
+        }
+
+        // todo - Get all available seats
+
+        // todo - Get remaining seats
+        this.seatsAvailable = null;
 
     }
 
-    private String convertEpochToDatestamp(Long epoch)
+    /**
+     * Private method used to fetch the Venue object for the event
+     */
+    private void fetchVenue()
     {
-        // Per https://stackoverflow.com/questions/7740972/convert-epoch-time-to-date
-
-        Date date = new Date(epoch);
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
-        return format.format(date);
-
+        this.venue = new Venue(this.venueID, null);
     }
-    
+
+    /**
+     * Private method used to fetch the SeatingType object for the event
+     */
+    private void fetchSeatingType()
+    {
+        this.seatingType = new SeatingType(this.seatingTypeID, null);
+    }
+
 }
