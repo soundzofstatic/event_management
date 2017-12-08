@@ -28,7 +28,7 @@ public class app{
     private String focusedEventID = null;
 
     //Cart shoppingCart;
-    private ArrayList<String> fauxShoppingCart;
+    private ArrayList<Ticket> fauxShoppingCart = new ArrayList<Ticket>();
 
     /**
      * Main Method
@@ -348,40 +348,19 @@ public class app{
         seatPanelList.setPreferredSize(new Dimension(panelWidth, (panelHeight - 25)));
         seatPanelList.setBackground(Color.ORANGE);
 
-//        // todo - Dummy String[]
-//        String[] dummySeatList = new String[50];
-//
-//        for(int i=0; i < dummySeatList.length; i++)
-//        {
-//            if (i % 2 == 0) {
-//
-//                dummySeatList[i] = i + " Hello";
-//
-//            } else {
-//
-//                dummySeatList[i] = i + " World";
-//
-//            }
-//
-//        }
-
-        /*ArrayList<Seat> seats =  newEvent.getSeats();
-
-        for(int i = 0; i < seats.size(); i++){
-
-            Seat seat = seats.get(i);
-
-            System.out.println("id: " + seat.getId() + ", row: " + seat.getRowNumber() + ", seat: " + seat.getSeatNumber() + ", floor: " + seat.getFloor());
-
-
-        }*/
-
         // new JScrollPane
         JScrollPane seatListScrollPane = new JScrollPane();
         seatListScrollPane.setPreferredSize(new Dimension(panelWidth, (panelHeight - 25)));
 
+        // Refresh the seatsSold ArrayList
+        focusedEvent.seatAvailabilityData();
+
+        System.out.println(focusedEvent.getSeatsSold().toString());
+
+
+
         // new JList
-        JList seatList = new JList(focusedEvent.getSeats().toArray());
+        JList seatList = new JList(focusedEvent.getSeatsAvailable().toArray());
         ListCellRenderer seatRenderer = new focusedSeatCellRenderer();
         seatList.setPreferredSize(new Dimension(panelWidth, (panelHeight - 25)));
 
@@ -423,10 +402,6 @@ public class app{
         JButton goHomeBTN = new JButton("Go Home");
         goHomeBTN.addActionListener(new goHomeListener());
 
-        // Add tickets to Checkout Button
-        JButton addToCartBTN = new JButton("Add Tickets to Cart");
-        // todo - need listener for addToCartBTN
-
         // Checkout Button
         JButton checkoutBTN = new JButton("Checkout");
         // todo - need listener for checkoutBTN
@@ -438,7 +413,6 @@ public class app{
 
         // Add the Buttons
         eventDetailsButtonPanel.add(goHomeBTN);
-        eventDetailsButtonPanel.add(addToCartBTN);
         eventDetailsButtonPanel.add(checkoutBTN);
 
         return eventDetailsButtonPanel;
@@ -511,12 +485,60 @@ public class app{
 
         public void valueChanged(ListSelectionEvent e)
         {
-            // todo - needs to be defined if anything should be done here
             if (!e.getValueIsAdjusting()){
                 JList source = (JList) e.getSource();
-                String selected = source.getSelectedValue().toString();
+                Seat selected = (Seat) source.getSelectedValue();
 
-                JOptionPane.showMessageDialog(null, selected);
+                // Create a new Panel for the Dialog
+                JPanel panel = new JPanel();
+                panel.add(new JLabel("Would you like to add the VIP Package to your ticket?"));
+
+                // The Options for the Option dialog
+                Object[] panelButtons = {"No", "Yes"};
+
+                //JOptionPane.showMessageDialog(null, selected);
+                int vipPackage = JOptionPane.showOptionDialog(
+                        null,
+                        panel,
+                        "VIP Package - Row: " + (selected.getRowNumber() + 1) + " Seat: " + (selected.getSeatNumber() + 1) ,
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        panelButtons,
+                        null
+                );
+
+                // todo - remove these lines as they were to used to DEBUG
+                System.out.println(vipPackage);
+                if (vipPackage == 1){
+
+                    System.out.println("CLICKED YES");
+
+                } else if (vipPackage == 0){
+
+                    System.out.println("CLICKED NO");
+
+                }
+
+                if(vipPackage != -1) { // Check to see if the user pressed the ESCAPE key
+                    // Get an instance of focusedEventID Event for the Pricing Fields
+                    Event localEvent = new Event(focusedEventID, null);
+
+                    // Now that we know the Ticket Type, we can compile a Ticket and add it to the Cart
+                    fauxShoppingCart.add(new Ticket(focusedEventID, selected.getId(), vipPackage == 1 ? localEvent.getVipTicketPrice() : localEvent.getBaseTicketPrice(), vipPackage == 1 ? "vip" : "regular"));
+
+                    // Gives Feedback to the user that the ticket was added to the cart
+                    JOptionPane.showMessageDialog(null, "Successfully added ticket for Row: " + (selected.getRowNumber() + 1) + " Seat: " + (selected.getSeatNumber() + 1));
+
+                }
+
+                // Refresh the page
+                // Add a new card to the containerPanel for the focusedEvent, use the focusedEvent value as the constraint
+                containerPanel.add(buildEventDetailWrappingPanel(), focusedEventID);
+
+                // Now show the card that you just added, an event detail card for focusedEventID
+                cards.show(containerPanel, focusedEventID);
+
             }
 
         }

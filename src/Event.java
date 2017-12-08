@@ -22,11 +22,12 @@ public class Event {
     private Venue venue;
     private String seatingTypeID;
     private SeatingType seatingType;
-    //  private String eventType;
+    private double baseTicketPrice;
+    private double vipTicketPrice;
     private int vipAvailability;
     private int regTixAvailability;
     private ArrayList<Seat> seats;
-    private ArrayList<String> seatsAvailable;
+    private ArrayList<Seat> seatsAvailable;
     private ArrayList<String> seatsSold;
     private String artistName;
     private String datetime;
@@ -73,12 +74,13 @@ public class Event {
      * @param title
      * @param venueID
      * @param seatingTypeID
+     * @param baseTicketPrice
      * @param vipAvailability
      * @param regTixAvailability
      * @param artistName
      * @param datetime
      */
-    public Event(String title, String venueID, String seatingTypeID, int vipAvailability, int regTixAvailability, String artistName, String datetime) {
+    public Event(String title, String venueID, String seatingTypeID, double baseTicketPrice, int vipAvailability, int regTixAvailability, String artistName, String datetime) {
 
         // Generate a UUID ID
         UUID uuid = UUID.randomUUID();
@@ -90,6 +92,8 @@ public class Event {
         this.title = title;
         this.venueID = venueID;
         this.seatingTypeID = seatingTypeID;
+        this.baseTicketPrice = baseTicketPrice;
+        this.vipTicketPrice = baseTicketPrice * 1.5; // use formula for VIP ticket pricing
         this.vipAvailability = vipAvailability;
         this.regTixAvailability = regTixAvailability;
         this.artistName = artistName;
@@ -245,6 +249,30 @@ public class Event {
     }
 
     /**
+     * Public getter method used to return this.baseTicketPrice
+     *
+     * @return
+     */
+    public double getBaseTicketPrice()
+    {
+
+        return this.baseTicketPrice;
+
+    }
+
+    /**
+     * Public getter method used to return this.vipTicketPrice
+     *
+     * @return
+     */
+    public double getVipTicketPrice()
+    {
+
+        return this.vipTicketPrice;
+
+    }
+
+    /**
      * Public Getter method that returns value of this.ticketAvailability
      *
      * @return String
@@ -281,7 +309,7 @@ public class Event {
      *
      * @return
      */
-    public ArrayList<String> getSeatsAvailable()
+    public ArrayList<Seat> getSeatsAvailable()
     {
         return this.seatsAvailable;
     }
@@ -305,7 +333,7 @@ public class Event {
     {
 
         // Create the String that represents a record
-        String record = "\"" + this.id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatingTypeID + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
+        String record = "\"" + this.id + "\",\"" + this.title + "\",\"" + this.venueID + "\",\"" + this.seatingTypeID + "\",\"" + this.baseTicketPrice + "\",\"" + this.vipTicketPrice + "\",\"" + this.vipAvailability + "\",\"" + this.regTixAvailability + "\",\"" + this.artistName + "\",\"" + this.datetime + "\",\"" + this.timestamp + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -374,18 +402,24 @@ public class Event {
                         this.seatingTypeID = recordArray[i];
                         break;
                     case 4:
-                        this.vipAvailability = Integer.parseInt(recordArray[i]);
+                        this.baseTicketPrice = Double.parseDouble(recordArray[i]);
                         break;
                     case 5:
-                        this.regTixAvailability = Integer.parseInt(recordArray[i]);
+                        this.vipTicketPrice = Double.parseDouble(recordArray[i]);
                         break;
                     case 6:
-                        this.artistName = recordArray[i];
+                        this.vipAvailability = Integer.parseInt(recordArray[i]);
                         break;
                     case 7:
-                        this.datetime = recordArray[i];
+                        this.regTixAvailability = Integer.parseInt(recordArray[i]);
                         break;
                     case 8:
+                        this.artistName = recordArray[i];
+                        break;
+                    case 9:
+                        this.datetime = recordArray[i];
+                        break;
+                    case 10:
                         this.timestamp = Long.parseLong(recordArray[i]);
                         break;
                 }
@@ -482,10 +516,31 @@ public class Event {
 
         }
 
-        // todo - Get all available seats
+        // Get all available seats
+        this.seatsAvailable = new ArrayList<Seat>();
+        // Iterate over Seats
+        for(Seat localSeat : this.seats) {
 
-        // todo - Get remaining seats
-        this.seatsAvailable = null;
+            boolean seatFound = false;
+
+            // check if the seat.getId() == one of the sold seats
+            for(String seatSoldID : this.seatsSold) {
+
+                if (localSeat.getId().equals(seatSoldID)){
+
+                    seatFound = true;
+
+                }
+
+            }
+
+            if(!seatFound) {
+
+                this.seatsAvailable.add(localSeat);
+
+            }
+
+        }
 
     }
 

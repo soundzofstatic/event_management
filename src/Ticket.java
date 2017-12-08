@@ -438,9 +438,9 @@ public class Ticket {
             String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
             // Skip records that don't have matching id
-            if(eventID != null && !recordArray[2].toLowerCase().equals(eventID.toLowerCase())) {
+            if(eventID != null && recordArray[2].toLowerCase().equals(eventID.toLowerCase())) {
 
-                // Push the ID of the seat that is sold
+                // Push the ID of the seat that is sold for eventID
                 seatSold.add(recordArray[3]);
                 continue;
 

@@ -27,7 +27,7 @@ public class event_management_examples {
 
         // exampleQueryVenue("SPECIFY_ID_HERE");
 
-        // exampleCreateSeatingType();
+        //exampleCreateSeatingType();
 
         // exampleQuerySeatingType("SPECIFY_ID_HERE");
 
@@ -35,29 +35,51 @@ public class event_management_examples {
 
     public static void exampleCreateEvent(String venueID, String seatingID)
     {
-      Event newEvent = new Event("Another Event Title", venueID, seatingID, 10, 90, "CarrotCake", "12/31/2017 23:30:00");
+        Event newEvent = new Event("Another Event Title", venueID, seatingID, 77.77, 10, 90, "CarrotCake", "12/31/2017 23:30:00");
 
     }
 
     public static void exampleQueryEvent(String eventID)
     {
         Event newEvent = new Event(eventID, null);
-        System.out.println("Title: " + newEvent.getTitle());
-        System.out.println("VenueID: " + newEvent.getVenueID());
-        System.out.println("Venue Obj: " + newEvent.getVenue());
-        System.out.println("SeatingTypeID: " + newEvent.getSeatingTypeID());
-        System.out.println("SeatingType Obj: " + newEvent.getSeatingType());
-        System.out.println("RegTixAvailability: " + newEvent.getRegTixAvailability());
-        System.out.println("VipTixAvailability: " + newEvent.getVipTicketAvailability());
-        System.out.println("ArtistName: " + newEvent.getArtistName());
-        System.out.println("Datetime: " + newEvent.getDatetime());
-        System.out.println("Timestamp: " + newEvent.getTimestamp());
-        System.out.println("Timestamp: " + newEvent.getActive());
-        // todo - System.out.println("Seats Available: " + newEvent.getSeatsAvailable().toString());
-        System.out.println("Seats Sold: " + newEvent.getSeatsSold().toString());
-        System.out.println();
-        System.out.println("Event State");
-        System.out.println(newEvent);
+//        System.out.println("Title: " + newEvent.getTitle());
+//        System.out.println("VenueID: " + newEvent.getVenueID());
+//        System.out.println("Venue Obj: " + newEvent.getVenue());
+//        System.out.println("SeatingTypeID: " + newEvent.getSeatingTypeID());
+//        System.out.println("SeatingType Obj: " + newEvent.getSeatingType());
+//        System.out.println("RegTixAvailability: " + newEvent.getRegTixAvailability());
+//        System.out.println("VipTixAvailability: " + newEvent.getVipTicketAvailability());
+//        System.out.println("ArtistName: " + newEvent.getArtistName());
+//        System.out.println("Datetime: " + newEvent.getDatetime());
+//        System.out.println("Timestamp: " + newEvent.getTimestamp());
+//        System.out.println("Timestamp: " + newEvent.getActive());
+//        // todo - System.out.println("Seats Available: " + newEvent.getSeatsAvailable().toString());
+//        System.out.println("Seats Sold: " + newEvent.getSeatsSold().toString());
+//        System.out.println();
+//        System.out.println("Event State");
+//        System.out.println(newEvent);
+//        System.out.println(newEvent.getSeats().toString());
+
+//        ArrayList<Seat> seats =  newEvent.getSeats();
+//
+//        for(int i = 0; i < seats.size(); i++){
+//
+//            Seat seat = seats.get(i);
+//
+//            System.out.println("id: " + seat.getId() + ", row: " + seat.getRowNumber() + ", seat: " + seat.getSeatNumber() + ", floor: " + seat.getFloor());
+//
+//
+//        }
+
+//        try {
+//
+//            Event.eventsList();
+//
+//        } catch (FileNotFoundException err){
+//
+//            System.out.println(err);
+//
+//        }
 
     }
 
@@ -172,7 +194,7 @@ public class event_management_examples {
 
         new SeatingType("Rectangular", 10, 990, 1, "rectangle", 3, 5, 3);
         new SeatingType("Circular", 10, 990, 1, "circle", 5, 5, 3);
-        new SeatingType("Trapezoidal", 10, 990, 1, "trapezoid", 3, 4, 3);
+        new SeatingType("Trapezoidal", 10, 990, 1, "trapezoid", 12, 5, 3);
         new SeatingType("Square", 10, 990, 1, "square", 5, 5, 3);
         new SeatingType("Example-5", 10, 990, 1, "rectangle", 5, 3, 3);
         new SeatingType("Example-6", 10, 990, 1, "square", 10, 10, 3);
