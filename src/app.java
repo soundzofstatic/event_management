@@ -22,7 +22,6 @@ public class app{
     final int WINDOW_HEIGHT = 600;
     private JFrame window = new JFrame("Ticketmaster2.0: Now with more tickets");
     private JPanel containerPanel = new JPanel();
-    private JPanel pageCartPanel = new JPanel(); // todo -  delete after build method is created for this
     private JPanel pageCheckoutPanel = new JPanel(); // todo - delete after build method is created for this
     private CardLayout cards  = new CardLayout();
     private String focusedEventID = null;
@@ -54,7 +53,7 @@ public class app{
         // Add the Panel Pages to the containerPanel
         containerPanel.add(buildHomeWrappingPanel(),"1"); // Home Page
         containerPanel.add(buildEventDetailWrappingPanel(),"2"); // Default Event Details Page, Will never be used, can possibly delete
-        containerPanel.add(pageCartPanel,"3"); // Cart Overview Page
+        containerPanel.add(buildCartWrappingPanel(),"3"); // Cart Overview Page
         containerPanel.add(pageCheckoutPanel,"4"); // Checkout Overview Page
 
         // Set which Panel displays First on load
@@ -419,6 +418,77 @@ public class app{
 
     }
 
+
+    private JPanel buildCartWrappingPanel()
+    {
+
+        // Create a Wrapper JPanel that will hold all of the inner contents
+        JPanel wrapper = new JPanel();
+        // Set wrapper LayoutManger to BorderLayout
+        wrapper.setLayout(new BorderLayout());
+        // Set wrapper Sizing
+        wrapper.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        wrapper.setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        // Set wrapper aesthetics
+        wrapper.setBackground(Color.GREEN);
+
+        // Add nested panels to wrapper
+        wrapper.add(buildHomeSpacerPanel(), BorderLayout.NORTH);
+        wrapper.add(buildCartDetailPanel(), BorderLayout.CENTER);
+        wrapper.add(buildHomeSpacerPanel(), BorderLayout.SOUTH);
+
+        return wrapper;
+
+    }
+
+    private JPanel buildCartDetailPanel() {
+        int panelWidth = 700;
+        int panelHeight = 500;
+
+        //Panel for holding a list of events
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+        panel.setMinimumSize(new Dimension(panelWidth, panelHeight));
+        panel.setBackground(Color.BLUE);
+
+        //Create JLabel for Cart Label
+        JLabel cartWord = new JLabel("Cart");
+        cartWord.setPreferredSize(new Dimension(panelWidth, 25));
+        cartWord.setMinimumSize(new Dimension(panelWidth, 25));
+
+        //new JScrollPane
+        JScrollPane cartListScrollPane = new JScrollPane();
+        cartListScrollPane.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
+        cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
+
+
+        ArrayList<String> cart = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            cart.add("dummyString");
+        }
+
+
+        //new JList
+        JList cartList = new JList(cart.toArray());
+        ListCellRenderer cartListRenderer = new cartListCellRenderer();
+        cartList.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
+        cartList.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
+
+        //set defined renderer to cart
+        cartList.setCellRenderer(cartListRenderer);
+
+        //add event listener
+        cartList.addListSelectionListener(new cartListListener());
+
+        //add to the viewport
+        cartListScrollPane.setViewportView(cartList);
+
+        panel.add(cartListScrollPane);
+
+        return panel;
+
+    }
     /*
 
         Listeners
@@ -476,6 +546,19 @@ public class app{
             return renderer;
         }
 
+    }
+
+    private class cartListCellRenderer implements ListCellRenderer{
+
+        protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+
+        public Component getCartListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+
+
+            JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, "test", index, isSelected, cellHasFocus);
+
+            return renderer;
+        }
     }
 
     /**
@@ -575,6 +658,38 @@ public class app{
         }
 
     }
+
+
+    private class cartListListener implements ListSelectionListener{
+        public void valueChanged(ListSelectionEvent e){
+
+            if (!e.getValueIsAdjusting()){
+
+                JPanel panel = new JPanel();
+                panel.add(new JLabel("Would you like to remove this item from your cart?")); //TODO personalize this dialogue
+
+                Object[] panelButtons = ["No", "Yes"];
+
+                int removeCartItem = JOptionPane.showOptionDialog(
+                        null,
+                        panel,
+                        "Remove ticket", //TODO personalie this dialogue
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        panelButtons,
+                        null
+                );
+
+
+
+            }
+
+        }
+    }
+
+
+
 
     /**
      * ActionListener for buttons invoking the goHomeListener
