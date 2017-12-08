@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
@@ -22,7 +23,6 @@ public class app{
     final int WINDOW_HEIGHT = 600;
     private JFrame window = new JFrame("Ticketmaster2.0: Now with more tickets");
     private JPanel containerPanel = new JPanel();
-    private JPanel pageCheckoutPanel = new JPanel(); // todo - delete after build method is created for this
     private CardLayout cards  = new CardLayout();
     private String focusedEventID = null;
 
@@ -54,7 +54,7 @@ public class app{
         containerPanel.add(buildHomeWrappingPanel(),"1"); // Home Page
         containerPanel.add(buildEventDetailWrappingPanel(),"2"); // Default Event Details Page, Will never be used, can possibly delete
         containerPanel.add(buildCartWrappingPanel(),"3"); // Cart Overview Page
-        containerPanel.add(pageCheckoutPanel,"4"); // Checkout Overview Page
+        containerPanel.add(buildCheckoutWrappingPanel(),"4"); // Checkout Overview Page
 
         // Set which Panel displays First on load
         cards.show(containerPanel, "1");
@@ -396,7 +396,7 @@ public class app{
      *
      * @return
      */
-    private JPanel buildEventDetailButtonPanel()
+    private JPanel buildEventDetailButtonPanel() //TODO generalize to be used by other methods
     {
 
         int panelWidth = 700;
@@ -408,7 +408,7 @@ public class app{
 
         // Checkout Button
         JButton checkoutBTN = new JButton("Checkout");
-        // todo - need listener for checkoutBTN
+        checkoutBTN.addActionListener(new checkoutListener());
 
         // New Panel that holds all of the contents before this
         JPanel eventDetailsButtonPanel = new JPanel();
@@ -463,8 +463,8 @@ public class app{
 
         //new JScrollPane
         JScrollPane cartListScrollPane = new JScrollPane();
-        cartListScrollPane.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
-        cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
+        cartListScrollPane.setPreferredSize(new Dimension(panelWidth, (panelHeight-50)));
+        cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-50)));
 
 
         ArrayList<String> cart = new ArrayList<>();
@@ -489,7 +489,133 @@ public class app{
         //add to the viewport
         cartListScrollPane.setViewportView(cartList);
 
+        //new JPanel
+        JPanel quantityPanel = new JPanel();
+        quantityPanel.setPreferredSize(new Dimension(panelWidth, 50));
+        quantityPanel.setMinimumSize(new Dimension(panelWidth, 50));
+
+        JLabel quantityLabel = new JLabel("0 Tickets");
+        quantityLabel.setPreferredSize(new Dimension((panelWidth), 25));
+        quantityLabel.setMinimumSize(new Dimension((panelWidth), 25));
+
+        JLabel totalLabel = new JLabel("Total: $0.00");
+        totalLabel.setPreferredSize(new Dimension((panelWidth), 25));
+        totalLabel.setMinimumSize(new Dimension((panelWidth), 25));
+
+        quantityPanel.add(quantityLabel);
+        quantityPanel.add(totalLabel);
+
+
+        panel.add(cartWord);
         panel.add(cartListScrollPane);
+        panel.add(quantityPanel);
+        panel.add(buildEventDetailButtonPanel());
+
+        return panel;
+
+    }
+
+    private JPanel buildCheckoutWrappingPanel()
+    {
+
+        // Create a Wrapper JPanel that will hold all of the inner contents
+        JPanel wrapper = new JPanel();
+        // Set wrapper LayoutManger to BorderLayout
+        wrapper.setLayout(new BorderLayout());
+        // Set wrapper Sizing
+        wrapper.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        wrapper.setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        // Set wrapper aesthetics
+        wrapper.setBackground(Color.GREEN);
+
+        // Add nested panels to wrapper
+        wrapper.add(buildHomeSpacerPanel(), BorderLayout.NORTH);
+        wrapper.add(buildCheckoutDetailPanel(), BorderLayout.CENTER);
+        wrapper.add(buildHomeSpacerPanel(), BorderLayout.SOUTH);
+
+        return wrapper;
+
+    }
+
+    private JPanel buildCheckoutDetailPanel() {
+        int panelWidth = 700;
+        int panelHeight = 500;
+
+        //Panel for holding a list of events
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+        panel.setMinimumSize(new Dimension(panelWidth, panelHeight));
+        panel.setBackground(Color.YELLOW);
+
+        //Create JLabel for Cart Label
+        JLabel cartWord = new JLabel("Checkout");
+        cartWord.setPreferredSize(new Dimension(panelWidth, 25));
+        cartWord.setMinimumSize(new Dimension(panelWidth, 25));
+
+        //new JScrollPane
+        JScrollPane cartListScrollPane = new JScrollPane();
+        cartListScrollPane.setPreferredSize(new Dimension(panelWidth, (panelHeight-50)));
+        cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-50)));
+
+
+        ArrayList<String> cart = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            cart.add("dummyString");
+        }
+
+
+        //new JList
+        JList cartList = new JList(cart.toArray());
+        ListCellRenderer cartListRenderer = new cartListCellRenderer();
+        cartList.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
+        cartList.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
+
+        //set defined renderer to cart
+        cartList.setCellRenderer(cartListRenderer);
+
+        //add event listener
+        cartList.addListSelectionListener(new cartListListener());
+
+        //add to the viewport
+        cartListScrollPane.setViewportView(cartList);
+
+        //new JPanel
+        JPanel quantityPanel = new JPanel();
+        quantityPanel.setPreferredSize(new Dimension(panelWidth, 50));
+        quantityPanel.setMinimumSize(new Dimension(panelWidth, 50));
+
+        JLabel quantityLabel = new JLabel("0 Tickets");
+        quantityLabel.setPreferredSize(new Dimension((panelWidth), 25));
+        quantityLabel.setMinimumSize(new Dimension((panelWidth), 25));
+
+        JLabel totalLabel = new JLabel("Total: $0.00");
+        totalLabel.setPreferredSize(new Dimension((panelWidth), 25));
+        totalLabel.setMinimumSize(new Dimension((panelWidth), 25));
+
+        JLabel thanksLabel = new JLabel("Thank you for using Ticketmaster 2.0: Optimize");
+        thanksLabel.setPreferredSize(new Dimension((panelWidth), 25));
+        thanksLabel.setMinimumSize(new Dimension((panelWidth), 25));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setPreferredSize(new Dimension(panelWidth, 100));
+        buttonPanel.setMinimumSize(new Dimension(panelWidth, 100));
+
+        JButton checkoutButton = new JButton("Close");
+        checkoutButton.addActionListener(new closeProgramListener());
+
+        buttonPanel.add(checkoutButton);
+
+        quantityPanel.add(quantityLabel);
+        quantityPanel.add(totalLabel);
+        quantityPanel.add(thanksLabel);
+
+
+        panel.add(cartWord);
+        panel.add(cartListScrollPane);
+        panel.add(quantityPanel);
+        panel.add(buttonPanel);
+
 
         return panel;
 
@@ -693,6 +819,19 @@ public class app{
         }
     }
 
+    private class closeProgramListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+
+
+
+                window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+
+
+
+
+        }
+    }
+
 
 
 
@@ -736,6 +875,27 @@ public class app{
 
             // Switch Cards back to Home
             cards.show(containerPanel, "3");
+
+        }
+
+    }
+
+    private class checkoutListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e)
+        {
+
+            // todo - remove all this commented code
+            //JButton source = (JButton) e.getSource();
+            //String selected = source.getText();
+
+            //JOptionPane.showMessageDialog(null, source.getText() + " - " + source.getActionCommand());
+
+            // Repaint the Frame
+            //loadHomeFrame();
+
+            // Switch Cards back to Home
+            cards.show(containerPanel, "4");
 
         }
 
