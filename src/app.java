@@ -201,6 +201,11 @@ public class app{
         panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
         panel.setBackground(Color.BLUE);
 
+        JButton cartButton = new JButton("See Cart");
+        cartButton.addActionListener(new cartViewListener());
+
+        panel.add(cartButton);
+
         return panel;
 
     }
@@ -552,7 +557,7 @@ public class app{
 
         protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
-        public Component getCartListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
 
 
             JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, "test", index, isSelected, cellHasFocus);
@@ -668,7 +673,7 @@ public class app{
                 JPanel panel = new JPanel();
                 panel.add(new JLabel("Would you like to remove this item from your cart?")); //TODO personalize this dialogue
 
-                Object[] panelButtons = ["No", "Yes"];
+                Object[] panelButtons = {"No", "Yes"};
 
                 int removeCartItem = JOptionPane.showOptionDialog(
                         null,
@@ -710,6 +715,27 @@ public class app{
 
             // Switch Cards back to Home
             cards.show(containerPanel, "1");
+
+        }
+
+    }
+
+    private class cartViewListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e)
+        {
+
+            // todo - remove all this commented code
+            //JButton source = (JButton) e.getSource();
+            //String selected = source.getText();
+
+            //JOptionPane.showMessageDialog(null, source.getText() + " - " + source.getActionCommand());
+
+            // Repaint the Frame
+            //loadHomeFrame();
+
+            // Switch Cards back to Home
+            cards.show(containerPanel, "3");
 
         }
 
