@@ -25,6 +25,7 @@ public class Event {
     //  private String eventType;
     private int vipAvailability;
     private int regTixAvailability;
+    private ArrayList<Seat> seats;
     private ArrayList<String> seatsAvailable;
     private ArrayList<String> seatsSold;
     private String artistName;
@@ -136,6 +137,17 @@ public class Event {
     }
 
     /**
+     * Public getter method used to return this.id
+     *
+     * @return
+     */
+    public String getId() {
+
+        return this.id;
+
+    }
+
+    /**
      * Public Getter method that returns the value of this.timestamp
      *
      * @return
@@ -171,11 +183,11 @@ public class Event {
     /**
      * Public Getter method that returns value of this.venue
      *
-     * @return String
+     * @return Venue
      */
-    public String getVenue() {
+    public Venue getVenue() {
 
-        return this.venue.toString();
+        return this.venue;
 
     }
 
@@ -202,11 +214,11 @@ public class Event {
     /**
      * Public Getter method that returns value of this.seatingType
      *
-     * @return String
+     * @return SeatingType
      */
-    public String getSeatingType() {
+    public SeatingType getSeatingType() {
 
-        return this.seatingType.toString();
+        return this.seatingType;
 
     }
 
@@ -252,6 +264,16 @@ public class Event {
 
         return this.vipAvailability;
 
+    }
+
+    /**
+     * Public getter method that returns value of this.seats
+     *
+     * @return
+     */
+    public ArrayList<Seat> getSeats()
+    {
+        return this.seats;
     }
 
     /**
@@ -424,7 +446,32 @@ public class Event {
     public void seatAvailabilityData()
     {
 
+        //
+        // Get the Seats Data for all seats
+        //
+        ArrayList<Row> rows = this.seatingType.getSeatMap();
+
+        this.seats = new ArrayList<Seat>();
+
+        // Iterate over Seat Rows
+        for(Row row : rows){
+
+            // Iterate over Seats
+            ArrayList<Seat> Seats = row.getSeats();
+
+            for(Seat seat : Seats) {
+
+                //this.seats.add(seat.getId());
+                this.seats.add(seat);
+                //System.out.println(seat.getId());
+
+            }
+
+        }
+
+        //
         // Check for Seats Sold
+        //
         try {
 
             this.seatsSold = Ticket.seatSold(this.id);
@@ -456,6 +503,34 @@ public class Event {
     private void fetchSeatingType()
     {
         this.seatingType = new SeatingType(this.seatingTypeID, null);
+    }
+
+    /**
+     * Public static method that returns an ArrayList of Events after looking through the DEFAUL_EVENT_FILE file
+     *
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static ArrayList<Event> eventsList() throws FileNotFoundException
+    {
+
+        ArrayList<Event> eventList = new ArrayList<>();
+
+        // Get input from the File
+        Scanner fileInput = new Scanner(new File(DEFAULT_EVENT_FILE));
+
+        while(fileInput.hasNextLine()){
+
+            // Read record line and explode it via ","
+            String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
+
+            // Get an Object for the event with id recordArray[0]
+            eventList.add(new Event(recordArray[0], null));
+
+        }
+
+        return eventList;
+
     }
 
 }

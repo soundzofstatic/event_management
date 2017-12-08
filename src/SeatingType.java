@@ -255,7 +255,7 @@ public class SeatingType {
                         this.shape = recordArray[i];
                         break;
                     case 6:
-                        this.seatMap =  convertStringtoArrayList(recordArray[i]);
+                        this.seatMap = convertStringtoArrayList(recordArray[i]);
                         break;
                 }
             }
@@ -321,7 +321,7 @@ public class SeatingType {
                         Row currentRow = seatLayout.get((seatLayout.size() - 1));
 
                         // Create a new Seat and set it to the last row object in the seatLayout
-                        currentRow.addSeat(new Seat(seatProperties[0]));
+                        currentRow.addSeat(new Seat(seatProperties[0], Integer.parseInt(seatProperties[1]), Integer.parseInt(seatProperties[2]), Integer.parseInt(seatProperties[3])));
 
                     }
 
@@ -374,7 +374,7 @@ public class SeatingType {
                 Seat currentSeat = seats.get(j);
 
                 // Add the currentSeat's to the general dynamicSeatArray as String[]
-                dynamicSeatArray.add(new String[]{currentSeat.getId()});
+                dynamicSeatArray.add(new String[]{currentSeat.getId(), Integer.toString(currentSeat.getRowNumber()), Integer.toString(currentSeat.getSeatNumber()), Integer.toString(currentSeat.getFloor())});
 
             }
 
@@ -411,8 +411,16 @@ public class SeatingType {
             // Iterate over Seats
             for(int j=0; j < seats; j++){
 
+                int localFloor = 1;
+
+                if(i >= 10) { // if the row count is greater than 10, then we are on the second floor
+
+                    localFloor = 2;
+
+                }
+
                 // Create a new Seat and set it to the last row object in the seatLayout
-                seatLayout.get((seatLayout.size() - 1)).addSeat(new Seat());
+                seatLayout.get((seatLayout.size() - 1)).addSeat(new Seat(i, j, localFloor));
 
             }
 

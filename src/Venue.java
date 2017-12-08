@@ -330,11 +330,9 @@ public class Venue {
                         this.zipCode = recordArray[i];
                         break;
                     case 7:
-                        System.out.println(recordArray[i]);
                         this.capacity = Integer.parseInt(recordArray[i]);
                         break;
                     case 8:
-                        System.out.println(recordArray[i]);
                         int[] seatMap = {1, 2, 3};
                         this.typeOfSeating = seatMap;
                         break;
