@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.UUID;
+import java.io.*;
+import java.util.Date;
 
 
 /**
@@ -10,26 +13,37 @@ import java.util.Scanner;
  */
  
  /*
- NEEDED: setRegTixAvailability() function in Event Class - lines 60, 114
-		 setVipTicketAvailability() function in Event Class - lines 80, 118
-		 location of Ticket Prices for an event (hard coded those in for now) - lines 59, 79
-		 getEvent() function in Ticket class, which returns Event object - lines 100, 114, 118
-		 A tester who's halfway decent at Java and isn't nursing the worst cold of the season!!! 
+ NEEDED: - Checkout method needs to write to a transactions.csv (see createRecord() method Event, Venue or SeatingType) file that keeps track of an order’s:
+			- transactionID/cartID
+			- # of tickets ordered
+			- Subtotal of order
+			- Tax for order (if needed)
+			- date of transaction (you can use the static method added into the Utility class)
+			- epoch of transaction (you can use the static method added into the Utility class)
  */
 
 public class Cart{
 
 	private ArrayList<Ticket> tixList;
+	private String id;
+	private double subtotal = 0.0;
+	private Date date = new Date();
+	
+	private static final String DEFAULT_TRANSACTIONS_FILE = "src/transactions.csv";
 
 	public Cart(){
 
-		tixList = new ArrayList<Ticket>();
+		this.tixList = new ArrayList<Ticket>();
+		UUID uuid = UUID.randomUUID();
+
+        // Set the id for the object
+        this.id = uuid.toString();
 
 	}
 
 	public ArrayList<Ticket> getTixList(){
 
-		return tixList;
+		return this.tixList;
 
 	}
 
@@ -39,62 +53,20 @@ public class Cart{
 
 	}
 
-	public Boolean add(Ticket newTicket, Event ticketedEvent){
+	public Boolean add(Ticket newTicket){
 		Boolean addSuccess = false;
 		Scanner console = new Scanner(System.in);
-		int input = 2;
-		int quantity = 0;
-
-		System.out.println("Would you like to buy Regular or VIP tickets for " + ticketedEvent.getTitle() + "? (type 1 for Regular tickets, or 2 for VIP.");
-		while (input != 1 && input != 2){
-			input = console.nextInt();
-			if (input != 1 && input != 2){
-				System.out.println("Invalid entry. Please type 1 for Regular tickets, or 2 for VIP tickets.");
-			}
-		}
-
-		if (input == 1){
-
-			if (ticketedEvent.getRegTixAvailability() == 0){
-				System.out.println("There are no regular tickets left for " + ticketedEvent.getTitle() + ". Please try adding a ticket to the cart again.");
-				return addSuccess;
-			}
-
-			do{
-				System.out.print("How many Regular tickets would you like to buy? There are only " + ticketedEvent.getRegTixAvailability() + " regular tickets left for " + ticketedEvent.getTitle() + ".");
-				int quantity = console.nextInt();
-			} while(quantity <= ticketedEvent.getRegTixAvailability() && quantity > 0);
-
-			for (x=0; x < quantity; x++){
-				tixList.add(new Ticket(ticketedEvent.getEventID(), ticketedEvent.getSeatID(), 2.00, "Regular"));
-				ticketedEvent.setRegTixAvailability((ticketedEvent.getRegTixAvailability()) - 1);
-			}
-			System.out.println(quantity + " Regular tickets added to cart.");
-
-			addSuccess = true;
+		
+		while (int i = 0; i < tixList.length(); i++){
+			if (tixList.get(i).getId() == newTicket.getId()){
 			return addSuccess;
-
-		}
-		else {
-
-			if (ticketedEvent.getVipTicketAvailability() == 0) {
-				System.out.println("There are no VIP tickets left for " + ticketedEvent.getTitle() + ". Please try adding a ticket to the cart again.");
-				return addSuccess;
 			}
-
-			do{System.out.print("How many VIP tickets would you like to buy? There are only " + ticketedEvent.getVipTicketAvailability() + " VIP tickets left for " + ticketedEvent.getTitle() + ".");
-				quantity = console.nextInt();
-			}while(quantity <= ticketedEvent.getVipTicketAvailability() && quantity > 0);
-
-			for (x=0; x < quantity; x++){
-				tixList.add(new Ticket(ticketedEvent.getEventID(), ticketedEvent.getSeatID(), 4.00, "VIP"));
-				ticketedEvent.setVipTicketAvailability((ticketedEvent.getVipTicketAvailability()) - 1);
-			}
-			System.out.println(quantity + " VIP tickets added to cart.");
-
-			addSuccess = true;
-			return addSuccess;
 		}
+		
+		this.tixList.add(newTicket);
+		this.subtotal += newTicket.getPrice();
+		addSuccess = true;
+		return addSuccess;
 	}
 
 	public Boolean remove(int ticketIndex){
@@ -103,53 +75,27 @@ public class Cart{
 		Boolean removeSuccess = false;
 
 		if (ticketIndex < 0 || ticketIndex >= tixList.length()){
-
-			System.out.println("The selected ticket does not exist in the cart. Please try again.");
 			return removeSuccess;
-
 		}
 
-		Ticket ticketRemoved = tixList.get(ticketIndex);
-		System.out.print("How many " + ticketRemoved.getTier() + " tickets for " ticketRemoved.getEvent().getTitle() + " would you like to remove?: ");
-		int quantity = console.nextInt();
-		System.out.println("");
-		while(quantity <= 0 || quantity > ticketRemoved.getQuantity()){
-			System.out.println("Invalid number. Please enter a number between 0 and " + ticketRemoved.getQuantity() + ": ");
-			quantity = console.nextInt();
-			System.out.println("");
-		}
-
-		if (quantity == ticketRemoved.getQuantity()){
-			tixList.remove(ticketIndex);
-		}
-		else {
-			ticketRemoved.setQuantity(ticketRemoved.getQuantity() - quantity);
-			if (ticketRemoved.getTier().equals("Regular")){
-				ticketRemoved.getEvent().setRegTixAvailability((ticketRemoved.getEvent().getRegTixAvailability) + quantity);
-			}
-			else{
-				ticketRemoved.getEvent().setVipTicketAvailability((ticketRemoved.getEvent().getVipTicketAvailability) + quantity);
-			}
-
-			System.out.println(ticketRemoved.getQuantity() + " " + ticketRemoved.getTier() + " tickets for " + ticketRemoved.getEvent() + " removed from cart.");
-		}
+		this.subtotal -= tixList.get(ticketIndex).getPrice();
+		tixList.remove(ticketIndex);
 		removeSuccess = true;
 		return removeSuccess;
 	}
 
 
 	public String toString(){
-		double subtotal = 0.0;
+		String cartString = "Tickets in Cart: \n";
 		double tax;
 		double total;
-		String cartString = "Tickets in Cart: \n";
 		for (int i = 0; i < tixList.length(); i++){
-			cartString += (tixList.get(i).getQuantity() + " " + tixList.get(i).getTier() + " tickets for " + tixList.get(i).getEvent() + "\n");
-			subtotal += (tixList.get(i).getPrice() * tixList.get(i).getQuantity());
+			cartString += (tixList.get(i).getId() + "\n");
+			this.subtotal += (tixList.get(i).getPrice());
 		}
-		tax = subtotal * .07;
-		total = subtotal + tax;
-		cartString += ((20 * "-") + "\nSubtotal: $" + String.format("%.2f", subtotal)) +
+		tax = this.subtotal * .07;
+		total = this.subtotal + tax;
+		cartString += ((20 * "-") + "\nSubtotal: $" + String.format("%.2f", this.subtotal)) +
 				("\n7% Tax: $" + String.format("%.2f", tax)) +
 				("\nTotal: $" + String.format("%.2f", total));
 		return cartString;
@@ -158,26 +104,76 @@ public class Cart{
 
 	public Boolean checkout(){
 		Boolean checkoutSuccess = false;
-		Scanner console = new Scanner(System.in);
-		System.out.println(this.toString());
-
-		System.out.print("Would you like to complete your checkout? (enter \"Y\" for yes or \"N\" for no.): ");
-		String checkoutConfirm = console.next().toUpper();
-		System.out.println("");
-
-		while (checkoutConfirm != "Y" && checkoutConfirm != "N") {
-			System.out.println("Please enter \"Y\" for yes, or \"N\" for no.");
-			checkoutConfirm = console.next().toUpper();
-		}
-		if (checkoutConfirm.equals("Y")){
-			System.out.println("Order confirmed. Thank you for shopping with us!");
-			checkoutSuccess = true;
+		
+		try {
+			createRecord();
+		} catch (FileNotFoundException e1) {
+			System.out.print("File not found. Checkout canceled.");
 			return checkoutSuccess;
 		}
-        else{
-			System.out.println("Order canceled. Checkout again to confirm your order.");
-			return checkoutSuccess;
+		
+		for (int i = 0; i < tixList.length(); i++){
+			tixlist.get(i).setPurchased(true);
 		}
+		
+		checkoutSuccess = true;
+		return checkoutSuccess;
+		
 	}
+	
+	private void createRecord() throws FileNotFoundException
+    {
+        String record = "\"" + this.id + "\",\"" + this.tixList.length + "\",\"" + String.format("%.2f", this.subtotal)) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
 
+        FileOutputStream file_output_stream = new FileOutputStream(new File(this.DEFAULT_TRANSACTIONS_FILE), true);
+
+        if(!this.checkDuplicateRecord()) {
+
+            PrintStream output = new PrintStream(file_output_stream);
+
+            output.println(record);
+
+        } else {
+
+            // todo - Does file_output_stream need to be closed in order to conserve resources?
+
+        }
+
+    }
+	
+	private boolean checkDuplicateRecord() throws FileNotFoundException
+    {
+
+        // Get input from the File
+        Scanner fileInput = new Scanner(new File(this.DEFAULT_TRANSACTIONS_FILE));
+
+        while(fileInput.hasNextLine()){
+
+            // read record line
+            String record = fileInput.nextLine();
+
+            // Explode the Record into individual elements
+            String[] recordArray = record.split(",");
+
+            // Iterate over the first element of the array (expected to be id)
+            for(int i=0; i < 1; i++){
+
+                if(i == 0){// if id
+
+                    if(recordArray[i].toLowerCase().substring(1, (recordArray[i].length() - 1)).equals(this.id.toLowerCase())){
+
+                        System.out.println("Duplicate Transaction ID.");
+
+                        return true;
+
+                    }
+
+                }
+            }
+
+        }
+
+        return false;
+
+    }
 }
