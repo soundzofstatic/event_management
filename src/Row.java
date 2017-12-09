@@ -4,12 +4,15 @@ import java.util.ArrayList;
  * DESCRIPTION
  *
  * @author Daniel Paz
+ * @author Scott Chaplinksi
+ * @author Clarissa Dean
  * @version 1.0
  */
 public class Row {
 
     int seatCount;
     ArrayList<Seat> seats = new ArrayList<Seat>();
+
 
     public String toString() {
 
@@ -27,6 +30,11 @@ public class Row {
 
     }
 
+    /**
+     * Public void method used to set a Seat within seats
+     *
+     * @param seat
+     */
     public void addSeat(Seat seat)
     {
 
@@ -37,6 +45,11 @@ public class Row {
 
     }
 
+    /**
+     * Public method used to return a ArrayList of Seat
+     *
+     * @return
+     */
     public ArrayList<Seat> getSeats()
     {
 
@@ -44,6 +57,10 @@ public class Row {
 
     }
 
+    /**
+     * Public void method used to return number of Seat in seats
+     *
+     */
     private void countSeats()
     {
 

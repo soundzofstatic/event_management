@@ -12,6 +12,7 @@ import java.util.Date;
  *
  * @author Scott Chaplinksi
  * @author Daniel Paz
+ * @author Clarissa Dean
  * @version 1.0
  */
 public class Event {
@@ -156,7 +157,7 @@ public class Event {
      *
      * @return
      */
-    public Long getTimestamp() {
+    public long getTimestamp() {
 
         return this.timestamp;
 
@@ -167,7 +168,7 @@ public class Event {
      *
      * @return
      */
-    public Boolean getActive() {
+    public boolean getActive() {
 
         return this.active;
 

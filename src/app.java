@@ -10,12 +10,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.IOException;
 
 /**
  * Application used to reserve and purchase tickets for events
  *
  * @author Daniel Paz
+ * @author Scott Chaplinksi
+ * @author Clarissa Dean
  */
 public class app{
 
@@ -25,9 +27,7 @@ public class app{
     private JPanel containerPanel = new JPanel();
     private CardLayout cards  = new CardLayout();
     private String focusedEventID = null;
-
-    //Cart shoppingCart;
-    private ArrayList<Ticket> fauxShoppingCart = new ArrayList<Ticket>();
+    private Cart shoppingCart;
 
     /**
      * Main Method
@@ -46,6 +46,18 @@ public class app{
      */
     public app()
     {
+
+        // Reclaim Abandonned Tickets
+        try {
+            // Cleanup all abandonned Tickets
+            Ticket.cleanupDeadTickets();
+        } catch (IOException err) {
+            System.out.print(err);
+        }
+
+
+        // Instantiate a new Cart object
+        this.shoppingCart = new Cart();
 
         // Set the Layout for the window Frame
         containerPanel.setLayout(cards);
@@ -147,7 +159,6 @@ public class app{
         // Panel for holding a list of events
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
-        panel.setBackground(Color.ORANGE);
 
         // Add a JLabel to panel
         JLabel label = new JLabel("Click on an event for more Information");
@@ -199,16 +210,80 @@ public class app{
         // Panel for holding Ads and cart
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
-        panel.setBackground(Color.BLUE);
 
-        JButton cartButton = new JButton("See Cart");
-        cartButton.addActionListener(new cartViewListener());
-
-        panel.add(cartButton);
+        // Add the CartButton JButton
+        panel.add(buildAdPanel());
+        panel.add(buildMiniCartViewPanel());
 
         return panel;
 
     }
+
+    /**
+     * Private method returning a JPanel that for Ads
+     *
+     * @return
+     */
+    private JPanel buildAdPanel()
+    {
+
+        int panelWidth = 350;
+        int panelHeight = 200;
+
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+        panel.setBackground(Color.BLUE);
+
+        return panel;
+
+    }
+
+    /**
+     * Private method that returns a Jpanel containing a overview of the Cart
+     *
+     * @return
+     */
+    private JPanel buildMiniCartViewPanel()
+    {
+
+        int panelWidth = 350;
+        int panelHeight = 300;
+
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+        //panel.setBackground(Color.DARK_GRAY);
+
+        // Build a Panel to hold details about the current Cart
+        // Create Textarea with Event details
+        String totalTextAreaString =  "Ticket QTY: " +  this.shoppingCart.getTixQuantity() + "\n\n";
+        totalTextAreaString +=  "Subtotal: $" +  String.format("%.2f", this.shoppingCart.getSubtotal()) + "\n";
+        totalTextAreaString +=  "Tax: $" +  String.format("%.2f", this.shoppingCart.getTax()) + "\n";
+        totalTextAreaString +=  "Total: $" +  String.format("%.2f", this.shoppingCart.getTotal()) + "\n";
+
+        // Compile the JTextarea
+        JTextArea totalTextArea = new JTextArea(totalTextAreaString);
+        totalTextArea.setPreferredSize(new Dimension(panelWidth, 200));
+        totalTextArea.setMinimumSize(new Dimension(panelWidth, 200));
+        totalTextArea.setLineWrap(true);
+        totalTextArea.setWrapStyleWord(true);
+        totalTextArea.setOpaque(false);
+        totalTextArea.setEditable(false);
+
+        // Build a Panel to hold 2 buttons
+        JPanel twoButtons = new JPanel();
+        twoButtons.setPreferredSize(new Dimension(panelWidth, 100));
+        twoButtons.setMinimumSize(new Dimension(panelWidth, 100));
+
+        // Add the Buttons
+        twoButtons.add(buildViewCartButton());
+        twoButtons.add(buildCheckoutButton());
+
+        panel.add(totalTextArea);
+        panel.add(twoButtons);
+
+        return panel;
+    }
+
 
     /**
      * Private method used as a blank spacer used on the Home Page
@@ -228,7 +303,6 @@ public class app{
         return homeSpacerlPanel;
 
     }
-
 
     /*
 
@@ -266,11 +340,11 @@ public class app{
             // Add nested panels to wrapper
             wrapper.add(buildEventDetailPanel(localEvent), BorderLayout.NORTH); // Event/Venue Details Panel
             wrapper.add(buildEventSeatsDetailPanel(localEvent), BorderLayout.CENTER); // Available Seats Panel
-            wrapper.add(buildEventDetailButtonPanel(), BorderLayout.SOUTH); // Buttons Panel
+            wrapper.add(buildStandardButtonPanel(), BorderLayout.SOUTH); // Buttons Panel
 
         } else {
 
-            // todo - call on an error screen
+            System.out.println("EventID is not defined");
 
         }
 
@@ -361,8 +435,6 @@ public class app{
 
         System.out.println(focusedEvent.getSeatsSold().toString());
 
-
-
         // new JList
         JList seatList = new JList(focusedEvent.getSeatsAvailable().toArray());
         ListCellRenderer seatRenderer = new focusedSeatCellRenderer();
@@ -391,38 +463,11 @@ public class app{
 
     }
 
-    /**
-     * Private method used to compile the Buttons (SOUTH region) contents for an Event Details Page
-     *
-     * @return
+    /*
+
+        Cart Card/Page/Panel
+
      */
-    private JPanel buildEventDetailButtonPanel() //TODO generalize to be used by other methods
-    {
-
-        int panelWidth = 700;
-        int panelHeight = 100;
-
-        // Go Home Button
-        JButton goHomeBTN = new JButton("Go Home");
-        goHomeBTN.addActionListener(new goHomeListener());
-
-        // Checkout Button
-        JButton checkoutBTN = new JButton("Checkout");
-        checkoutBTN.addActionListener(new checkoutListener());
-
-        // New Panel that holds all of the contents before this
-        JPanel eventDetailsButtonPanel = new JPanel();
-        eventDetailsButtonPanel.setPreferredSize(new Dimension(panelWidth, panelHeight));
-        eventDetailsButtonPanel.setMinimumSize(new Dimension(panelWidth, panelHeight));
-
-        // Add the Buttons
-        eventDetailsButtonPanel.add(goHomeBTN);
-        eventDetailsButtonPanel.add(checkoutBTN);
-
-        return eventDetailsButtonPanel;
-
-    }
-
 
     private JPanel buildCartWrappingPanel()
     {
@@ -446,7 +491,8 @@ public class app{
 
     }
 
-    private JPanel buildCartDetailPanel() {
+    private JPanel buildCartDetailPanel()
+    {
         int panelWidth = 700;
         int panelHeight = 500;
 
@@ -454,10 +500,9 @@ public class app{
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
         panel.setMinimumSize(new Dimension(panelWidth, panelHeight));
-        panel.setBackground(Color.BLUE);
 
         //Create JLabel for Cart Label
-        JLabel cartWord = new JLabel("Cart");
+        JLabel cartWord = new JLabel("Cart - Click on Ticket list item to remove from your Cart");
         cartWord.setPreferredSize(new Dimension(panelWidth, 25));
         cartWord.setMinimumSize(new Dimension(panelWidth, 25));
 
@@ -466,16 +511,8 @@ public class app{
         cartListScrollPane.setPreferredSize(new Dimension(panelWidth, (panelHeight-50)));
         cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-50)));
 
-
-        ArrayList<String> cart = new ArrayList<>();
-
-        for(int i = 0; i < 10; i++){
-            cart.add("dummyString");
-        }
-
-
         //new JList
-        JList cartList = new JList(cart.toArray());
+        JList cartList = new JList(shoppingCart.getTixList().toArray());
         ListCellRenderer cartListRenderer = new cartListCellRenderer();
         cartList.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
         cartList.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
@@ -494,26 +531,42 @@ public class app{
         quantityPanel.setPreferredSize(new Dimension(panelWidth, 50));
         quantityPanel.setMinimumSize(new Dimension(panelWidth, 50));
 
-        JLabel quantityLabel = new JLabel("0 Tickets");
-        quantityLabel.setPreferredSize(new Dimension((panelWidth), 25));
-        quantityLabel.setMinimumSize(new Dimension((panelWidth), 25));
+        JLabel quantityLabel = new JLabel("Ticket QTY: " + shoppingCart.getTixQuantity());
+        quantityLabel.setPreferredSize(new Dimension(((panelWidth /2) - 5), 25));
+        quantityLabel.setMinimumSize(new Dimension(((panelWidth /2) - 5), 25));
 
-        JLabel totalLabel = new JLabel("Total: $0.00");
-        totalLabel.setPreferredSize(new Dimension((panelWidth), 25));
-        totalLabel.setMinimumSize(new Dimension((panelWidth), 25));
+        // Create Textarea with Event details
+        String totalTextAreaString =  "Subtotal: $" +  String.format("%.2f", shoppingCart.getSubtotal()) + "\n";
+        totalTextAreaString +=  "Tax: $" +  String.format("%.2f", shoppingCart.getTax()) + "\n";
+        totalTextAreaString +=  "Total: $" +  String.format("%.2f", shoppingCart.getTotal()) + "\n";
+
+        // Compile the JTextarea
+        JTextArea totalTextArea = new JTextArea(totalTextAreaString);
+        totalTextArea.setPreferredSize(new Dimension(((panelWidth /2) - 5), 50));
+        totalTextArea.setMinimumSize(new Dimension(((panelWidth /2) - 5), 50));
+        totalTextArea.setLineWrap(true);
+        totalTextArea.setWrapStyleWord(true);
+        totalTextArea.setOpaque(false);
+        totalTextArea.setEditable(false);
 
         quantityPanel.add(quantityLabel);
-        quantityPanel.add(totalLabel);
+        quantityPanel.add(totalTextArea);
 
 
         panel.add(cartWord);
         panel.add(cartListScrollPane);
         panel.add(quantityPanel);
-        panel.add(buildEventDetailButtonPanel());
+        panel.add(buildStandardButtonPanel());
 
         return panel;
 
     }
+
+    /*
+
+        Checkout Card/Page/Panel
+
+     */
 
     private JPanel buildCheckoutWrappingPanel()
     {
@@ -537,7 +590,8 @@ public class app{
 
     }
 
-    private JPanel buildCheckoutDetailPanel() {
+    private JPanel buildCheckoutDetailPanel()
+    {
         int panelWidth = 700;
         int panelHeight = 500;
 
@@ -545,7 +599,6 @@ public class app{
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
         panel.setMinimumSize(new Dimension(panelWidth, panelHeight));
-        panel.setBackground(Color.YELLOW);
 
         //Create JLabel for Cart Label
         JLabel cartWord = new JLabel("Checkout");
@@ -558,15 +611,7 @@ public class app{
         cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-50)));
 
 
-        ArrayList<String> cart = new ArrayList<>();
-
-        for(int i = 0; i < 10; i++){
-            cart.add("dummyString");
-        }
-
-
-        //new JList
-        JList cartList = new JList(cart.toArray());
+        JList cartList = new JList(shoppingCart.getTixList().toArray());
         ListCellRenderer cartListRenderer = new cartListCellRenderer();
         cartList.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
         cartList.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
@@ -585,15 +630,25 @@ public class app{
         quantityPanel.setPreferredSize(new Dimension(panelWidth, 50));
         quantityPanel.setMinimumSize(new Dimension(panelWidth, 50));
 
-        JLabel quantityLabel = new JLabel("0 Tickets");
-        quantityLabel.setPreferredSize(new Dimension((panelWidth), 25));
-        quantityLabel.setMinimumSize(new Dimension((panelWidth), 25));
+        JLabel quantityLabel = new JLabel("Ticket QTY: " + shoppingCart.getTixQuantity());
+        quantityLabel.setPreferredSize(new Dimension(((panelWidth /2) - 5), 25));
+        quantityLabel.setMinimumSize(new Dimension(((panelWidth /2) - 5), 25));
 
-        JLabel totalLabel = new JLabel("Total: $0.00");
-        totalLabel.setPreferredSize(new Dimension((panelWidth), 25));
-        totalLabel.setMinimumSize(new Dimension((panelWidth), 25));
+        // Create Textarea with Event details
+        String totalTextAreaString =  "Subtotal: $" +  String.format("%.2f", shoppingCart.getSubtotal()) + "\n";
+        totalTextAreaString +=  "Tax: $" +  String.format("%.2f", shoppingCart.getTax()) + "\n";
+        totalTextAreaString +=  "Total: $" +  String.format("%.2f", shoppingCart.getTotal()) + "\n";
 
-        JLabel thanksLabel = new JLabel("Thank you for using Ticketmaster 2.0: Optimize");
+        // Compile the JTextarea
+        JTextArea totalTextArea = new JTextArea(totalTextAreaString);
+        totalTextArea.setPreferredSize(new Dimension(((panelWidth /2) - 5), 50));
+        totalTextArea.setMinimumSize(new Dimension(((panelWidth /2) - 5), 50));
+        totalTextArea.setLineWrap(true);
+        totalTextArea.setWrapStyleWord(true);
+        totalTextArea.setOpaque(false);
+        totalTextArea.setEditable(false);
+
+        JLabel thanksLabel = new JLabel("Thank you for using Ticketmaster 2.0: Optimized");
         thanksLabel.setPreferredSize(new Dimension((panelWidth), 25));
         thanksLabel.setMinimumSize(new Dimension((panelWidth), 25));
 
@@ -601,13 +656,10 @@ public class app{
         buttonPanel.setPreferredSize(new Dimension(panelWidth, 100));
         buttonPanel.setMinimumSize(new Dimension(panelWidth, 100));
 
-        JButton checkoutButton = new JButton("Close");
-        checkoutButton.addActionListener(new closeProgramListener());
-
-        buttonPanel.add(checkoutButton);
+        buttonPanel.add(buildCloseButton());
 
         quantityPanel.add(quantityLabel);
-        quantityPanel.add(totalLabel);
+        quantityPanel.add(totalTextArea);
         quantityPanel.add(thanksLabel);
 
 
@@ -620,6 +672,100 @@ public class app{
         return panel;
 
     }
+
+    /*
+
+        General Panels
+
+     */
+
+    /**
+     * Private method used to compile the Buttons (SOUTH region) contents for an Event Details Page
+     *
+     * @return
+     */
+    private JPanel buildStandardButtonPanel()
+    {
+
+        int panelWidth = 700;
+        int panelHeight = 100;
+
+        // New Panel that holds all of the contents before this
+        JPanel eventDetailsButtonPanel = new JPanel();
+        eventDetailsButtonPanel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+        eventDetailsButtonPanel.setMinimumSize(new Dimension(panelWidth, panelHeight));
+
+        // Add the Buttons
+        eventDetailsButtonPanel.add(buildViewGoHomeButton()); // Go Home Button
+        eventDetailsButtonPanel.add(buildViewCartButton()); // View Cart button
+        eventDetailsButtonPanel.add(buildCheckoutButton()); // Checkout Button
+
+        return eventDetailsButtonPanel;
+
+    }
+
+    /*
+
+        Buttons
+
+     */
+
+    /**
+     * Private method that returns a JButton for a view cart button
+     * @return
+     */
+    private JButton buildViewCartButton()
+    {
+
+        JButton cartButton = new JButton("View Cart");
+        cartButton.addActionListener(new cartViewListener());
+
+        return cartButton;
+
+    }
+
+    /**
+     * Private method that returns a JButton for a go home button
+     * @return
+     */
+    private JButton buildViewGoHomeButton()
+    {
+        // Go Home Button
+        JButton goHomeBTN = new JButton("Go Home");
+        goHomeBTN.addActionListener(new goHomeListener());
+
+        return goHomeBTN;
+
+    }
+
+    /**
+     * Private method that returns a JButton for a checkout button
+     * @return
+     */
+    private JButton buildCheckoutButton()
+    {
+        // Go Home Button
+        JButton checkoutBTN = new JButton("Checkout");
+        checkoutBTN.addActionListener(new checkoutListener());
+
+        return checkoutBTN;
+
+    }
+
+    /**
+     * Private method that returns a JButton for a close program button
+     * @return
+     */
+    private JButton buildCloseButton()
+    {
+        // Go Home Button
+        JButton closeBTN = new JButton("Close");
+        closeBTN.addActionListener(new closeProgramListener());
+
+        return closeBTN;
+
+    }
+
     /*
 
         Listeners
@@ -631,11 +777,6 @@ public class app{
      * but displays a human readable list item
      */
     private class focusedSeatCellRenderer implements ListCellRenderer {
-
-        // todo - Detemerine if this FocustBorder need to stay
-        protected Border noFocusBorder = new EmptyBorder(15, 1, 1, 1);
-
-        protected TitledBorder focusBorder = new TitledBorder(LineBorder.createGrayLineBorder(), "title");
 
         protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
@@ -657,11 +798,6 @@ public class app{
      * but displays a human readable list item
      */
     private class eventListCellRenderer implements ListCellRenderer {
-
-        // todo - Detemerine if this FocustBorder need to stay
-        protected Border noFocusBorder = new EmptyBorder(15, 1, 1, 1);
-
-        protected TitledBorder focusBorder = new TitledBorder(LineBorder.createGrayLineBorder(), "title");
 
         protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
@@ -685,8 +821,33 @@ public class app{
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
 
+            // Get the Object value and cast it as a Seat
+            Ticket thisTicket = (Ticket) value;
 
-            JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, "test", index, isSelected, cellHasFocus);
+            // Get the Event details for this Ticket
+            Event thisTicketEvent = new Event(thisTicket.getEventID(), null);
+
+            Seat thisSeat = null;
+
+            // Get the Seat Details for this Ticket
+            for(Seat seat : thisTicketEvent.getSeats()){
+
+                if(thisSeat != null){
+
+                    break;
+
+                }
+
+                if(seat.getId().equals(thisTicket.getSeatID())){
+
+                    thisSeat = seat;
+                    continue;
+
+                }
+
+            }
+
+            JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, "Ticket: " + thisTicket.getId() + " (" +  thisTicket.getTier() + ") - " + thisTicketEvent.getTitle() + " - Row " + (thisSeat.getRowNumber() + 1) + ", Seat " + (thisSeat.getSeatNumber() + 1), index, isSelected, cellHasFocus);
 
             return renderer;
         }
@@ -722,24 +883,12 @@ public class app{
                         null
                 );
 
-                // todo - remove these lines as they were to used to DEBUG
-                System.out.println(vipPackage);
-                if (vipPackage == 1){
-
-                    System.out.println("CLICKED YES");
-
-                } else if (vipPackage == 0){
-
-                    System.out.println("CLICKED NO");
-
-                }
-
                 if(vipPackage != -1) { // Check to see if the user pressed the ESCAPE key
                     // Get an instance of focusedEventID Event for the Pricing Fields
                     Event localEvent = new Event(focusedEventID, null);
 
                     // Now that we know the Ticket Type, we can compile a Ticket and add it to the Cart
-                    fauxShoppingCart.add(new Ticket(focusedEventID, selected.getId(), vipPackage == 1 ? localEvent.getVipTicketPrice() : localEvent.getBaseTicketPrice(), vipPackage == 1 ? "vip" : "regular"));
+                    shoppingCart.add(new Ticket(focusedEventID, shoppingCart.getId(), selected.getId(), vipPackage == 1 ? localEvent.getVipTicketPrice() : localEvent.getBaseTicketPrice(), vipPackage == 1 ? "vip" : "regular"));
 
                     // Gives Feedback to the user that the ticket was added to the cart
                     JOptionPane.showMessageDialog(null, "Successfully added ticket for Row: " + (selected.getRowNumber() + 1) + " Seat: " + (selected.getSeatNumber() + 1));
@@ -767,7 +916,7 @@ public class app{
         public void valueChanged(ListSelectionEvent e)
         {
 
-            // Check if the User is changing selection, i think todo - clarify what isAdjusting looks out for
+            // Check if the User is changing selection
             if (!e.getValueIsAdjusting()){
 
                 // Get the source from e, cast it as a JList
@@ -791,20 +940,24 @@ public class app{
     }
 
 
+    /**
+     * ListSelectionListener for lists invoking the cartListListener
+     */
     private class cartListListener implements ListSelectionListener{
+
         public void valueChanged(ListSelectionEvent e){
 
             if (!e.getValueIsAdjusting()){
 
                 JPanel panel = new JPanel();
-                panel.add(new JLabel("Would you like to remove this item from your cart?")); //TODO personalize this dialogue
+                panel.add(new JLabel("Would you like to remove this item from your cart?"));
 
                 Object[] panelButtons = {"No", "Yes"};
 
                 int removeCartItem = JOptionPane.showOptionDialog(
                         null,
                         panel,
-                        "Remove ticket", //TODO personalie this dialogue
+                        "Remove ticket",
                         JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE,
                         null,
@@ -812,28 +965,44 @@ public class app{
                         null
                 );
 
+                if(removeCartItem == 1) {
 
+                    JList source = (JList) e.getSource();
+                    Ticket selectedTicket = (Ticket) source.getSelectedValue();
+
+                    // Remove Ticket from Cart
+                    shoppingCart.remove(selectedTicket.getId());
+
+                    try {
+                        // Remove Ticket from File
+                        Ticket.removeTicketFromFile(selectedTicket.getId());
+                    } catch (IOException err){
+
+                        System.out.println(err);
+
+                    }
+
+                    // Add the card, effectively replacing it
+                    containerPanel.add(buildHomeWrappingPanel(), "1");
+
+                    // Switch Cards back to Home
+                    cards.show(containerPanel, "1");
+
+
+                } else if(removeCartItem < 0) {
+
+                    // Do Nothing
+
+                } else {
+
+                    // Do Nothing
+
+                }
 
             }
 
         }
     }
-
-    private class closeProgramListener implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-
-
-
-                window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-
-
-
-
-        }
-    }
-
-
-
 
     /**
      * ActionListener for buttons invoking the goHomeListener
@@ -843,14 +1012,8 @@ public class app{
         public void actionPerformed(ActionEvent e)
         {
 
-            // todo - remove all this commented code
-            //JButton source = (JButton) e.getSource();
-            //String selected = source.getText();
-
-            //JOptionPane.showMessageDialog(null, source.getText() + " - " + source.getActionCommand());
-
-            // Repaint the Frame
-            //loadHomeFrame();
+            // Add the card, effectively replacing it
+            containerPanel.add(buildHomeWrappingPanel(), "1");
 
             // Switch Cards back to Home
             cards.show(containerPanel, "1");
@@ -859,19 +1022,16 @@ public class app{
 
     }
 
+    /**
+     * ActionListener for View Cart Button implementing cartViewListener
+     */
     private class cartViewListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e)
         {
 
-            // todo - remove all this commented code
-            //JButton source = (JButton) e.getSource();
-            //String selected = source.getText();
-
-            //JOptionPane.showMessageDialog(null, source.getText() + " - " + source.getActionCommand());
-
-            // Repaint the Frame
-            //loadHomeFrame();
+            // Add the card, effectively replacing it
+            containerPanel.add(buildCartDetailPanel(), "3");
 
             // Switch Cards back to Home
             cards.show(containerPanel, "3");
@@ -880,25 +1040,85 @@ public class app{
 
     }
 
+    /**
+     * ActionLIstener for Checkout Button implementing checkoutListener
+     */
     private class checkoutListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e)
         {
 
-            // todo - remove all this commented code
-            //JButton source = (JButton) e.getSource();
-            //String selected = source.getText();
+            // Notify the User that Checkingout will finalize their order
+            // Create a new Panel for the Dialog
+            /*JPanel panel = new JPanel();
+            panel.add(new JLabel("Clicking on Checkout will finalize your Ticket Order. You will not be able to add any more tickets. Would you like to continue or Keep shopping?"));
 
-            //JOptionPane.showMessageDialog(null, source.getText() + " - " + source.getActionCommand());
+            // The Options for the Option dialog
+            Object[] panelButtons = {"Keep Shopping", "Continue to Checkout"};
 
-            // Repaint the Frame
-            //loadHomeFrame();
+            //JOptionPane.showMessageDialog(null, selected);
+            int checkout = JOptionPane.showOptionDialog(
+                    null,
+                    panel,
+                    "Checkout" ,
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    panelButtons,
+                    null
+            );*/
 
-            // Switch Cards back to Home
-            cards.show(containerPanel, "4");
+            //if(checkout == 1) {
+
+
+                if (shoppingCart.getTixQuantity() > 0) {
+
+                    // Gives Feedback to the user that the ticket was added to the cart
+                    JOptionPane.showMessageDialog(null, "Success! You have been successfully checked-out. Save the details of your order for your records. Thank you!");
+
+                    // Checkout the Cart into a file
+                    shoppingCart.checkout();
+
+                } else {
+
+                    // Gives Feedback to the user that the ticket was added to the cart
+                    JOptionPane.showMessageDialog(null, "Your cart was empty. Nothing To Checkout.");
+
+                }
+
+                try {
+                    // Cleanup all abandonned Tickets
+                    Ticket.cleanupDeadTickets();
+                } catch (IOException err) {
+                    System.out.print(err);
+                }
+
+                // Add the card, effectively replacing it
+                containerPanel.add(buildCheckoutDetailPanel(), "4");
+
+                // Switch Cards back to Home
+                cards.show(containerPanel, "4");
+
+
+            //} else if( checkout < 1) {
+                // User hit escape or No button
+                //Do Nothing
+
+            //}
 
         }
 
+    }
+
+    /**
+     * ActionListener for buttons invoking the closeProgramListener
+     */
+    private class closeProgramListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+
+        }
     }
 
 }

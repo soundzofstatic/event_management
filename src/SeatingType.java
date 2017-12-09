@@ -8,6 +8,8 @@ import java.util.UUID;
  * DESCRIPTION
  *
  * @author Daniel Paz
+ * @author Scott Chaplinksi
+ * @author Clarissa Dean
  * @version 1.0
  */
 public class SeatingType {

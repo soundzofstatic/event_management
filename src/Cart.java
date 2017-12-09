@@ -9,6 +9,8 @@ import java.util.Date;
  * DESCRIPTION
  *
  * @author Clarissa Dean
+ * @author Daniel Paz
+ * @author Scott Chaplinksi
  * @version 1.0
  */
 
@@ -39,6 +41,16 @@ public class Cart{
 
 	}
 
+	/**
+	 * Public getter method that returns the valye of this.id
+	 *
+	 * @return
+	 */
+	public String getId() {
+
+		return this.id;
+
+	}
 
 	/**
 	 * Public Getter method that returns the value of this.tixList
@@ -227,7 +239,7 @@ public class Cart{
 	 */
 	private void createRecord() throws FileNotFoundException
 	{
-		String record = "\"" + this.id + "\",\"" + this.tixList.size() + "\",\"" + String.format("%.2f", this.subtotal) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + Utility.convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
+		String record = "\"" + this.id + "\",\"" + this.tixList.size() + "\",\"" + String.format("%.2f", this.subtotal) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + String.format("%.2f", this.total) + "\",\"" + Utility.convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
 
 		FileOutputStream file_output_stream = new FileOutputStream(new File(this.DEFAULT_TRANSACTIONS_FILE), true);
 

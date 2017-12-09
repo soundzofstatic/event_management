@@ -7,6 +7,7 @@ import java.util.UUID;
  *
  * @author Scott Chaplinksi
  * @author Daniel Paz
+ * @author Clarissa Dean
  * @version 1.0
  */
 public class Ticket {
@@ -25,11 +26,13 @@ public class Ticket {
     /**
      * Ticket constructor used to accept client code definitions for a venue and implicitly writes data to a file
      *
+     * @param eventID
+     * @param cartID
      * @param seatID
      * @param price
      * @param tier
      */
-    public Ticket(String eventID, String seatID, double price, String tier) {
+    public Ticket(String eventID, String cartID, String seatID, double price, String tier) {
 
 
         try {
@@ -38,6 +41,7 @@ public class Ticket {
 
                 // Set all of the object fields
                 this.id = UUID.randomUUID().toString();
+                this.cartID = cartID;
                 this.eventID = eventID;
                 this.seatID = seatID;
                 this.price = price;
@@ -200,7 +204,7 @@ public class Ticket {
     }
 
     /**
-     * Public getter method that sets the String value of this.cartID
+     * Public setter method that sets the String value of this.cartID
      *
      * @param cartID
      */
@@ -306,7 +310,7 @@ public class Ticket {
     {
 
         // Create the String that represents a record
-        String record = "\"" + this.id + "\",\"" + this.status + "\",\"" + this.eventID + "\",\"" + this.seatID + "\",\"" + this.price + "\",\"" + this.tier + "\",\"" + this.purchased + "\"";
+        String record = "\"" + this.id + "\",\"" + this.status + "\",\"" + this.cartID + "\",\"" + this.eventID + "\",\"" + this.seatID + "\",\"" + this.price + "\",\"" + this.tier + "\",\"" + this.purchased + "\"";
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
@@ -362,18 +366,21 @@ public class Ticket {
                         this.status = recordArray[i];
                         break;
                     case 2:
-                        this.eventID = recordArray[i];
+                        this.cartID = recordArray[i];
                         break;
                     case 3:
-                        this.seatID = recordArray[i];
+                        this.eventID = recordArray[i];
                         break;
                     case 4:
-                        this.price = Double.parseDouble(recordArray[i]);
+                        this.seatID = recordArray[i];
                         break;
                     case 5:
-                        this.tier = recordArray[i];
+                        this.price = Double.parseDouble(recordArray[i]);
                         break;
                     case 6:
+                        this.tier = recordArray[i];
+                        break;
+                    case 7:
                         this.purchased = Boolean.parseBoolean(recordArray[i]);
                         break;
                 }
@@ -438,10 +445,10 @@ public class Ticket {
             String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
             // Skip records that don't have matching id
-            if(eventID != null && recordArray[2].toLowerCase().equals(eventID.toLowerCase())) {
+            if(eventID != null && recordArray[3].toLowerCase().equals(eventID.toLowerCase())) {
 
                 // Push the ID of the seat that is sold for eventID
-                seatSold.add(recordArray[3]);
+                seatSold.add(recordArray[4]);
                 continue;
 
             }
@@ -451,6 +458,11 @@ public class Ticket {
 
     }
 
+    /**
+     * Static public method used to cleanup tickets that were abandonned in pending status in the DEFAULT_TICKET_FILE
+     *
+     * @throws IOException
+     */
     public static void cleanupDeadTickets() throws IOException
     {
 
@@ -467,6 +479,50 @@ public class Ticket {
 
             // Only keep records that are marked sold
             if(recordArray[1].toLowerCase().equals("sold")) {
+
+                fileContents += Utility.implode(recordArray, ",") + "\n";
+
+            }
+
+        }
+
+        fileInput.close();
+
+        // Reopen File, this time overwrite mode
+        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_TICKET_FILE), false);
+
+        // Create a PrintStream object that will be used to output the file
+        PrintStream output = new PrintStream(file_output_stream);
+
+        // Write to the file
+        output.print(fileContents);
+
+        // Close the file output stream
+        file_output_stream.close();
+
+    }
+
+    /**
+     * Static public method used to delete a ticket by ID in the DEFAULT_TICKET_FILE
+     *
+     * @throws IOException
+     */
+    public static void removeTicketFromFile(String ticketID) throws IOException
+    {
+
+        Scanner fileInput = new Scanner(new File(DEFAULT_TICKET_FILE));
+
+        String fileContents = "";
+
+        while(fileInput.hasNextLine()){
+
+            String line = fileInput.nextLine();
+
+            // Read record line and explode it via ","
+            String[] recordArray = Utility.explode(line, ",");
+
+            // Only keep records that are marked sold
+            if(!recordArray[0].equals(ticketID)) {
 
                 fileContents += Utility.implode(recordArray, ",") + "\n";
 

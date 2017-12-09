@@ -3,6 +3,8 @@ import java.util.UUID;
  * DESCRIPTION
  *
  * @author Daniel Paz
+ * @author Scott Chaplinksi
+ * @author Clarissa Dean
  * @version 1.0
  */
 public class Seat {
@@ -113,15 +115,6 @@ public class Seat {
 
     }
 
-    /*
-        Public Methods
-     */
-
-    public String[] getSeatArray() {
-
-        return new String[]{id};
-
-    }
 
 }
 
