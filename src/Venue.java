@@ -368,6 +368,12 @@ public class Venue {
             // Explode the Record into individual elements
             String[] recordArray = record.split(",");
 
+            if(recordArray.length <= 1){
+
+                continue;
+
+            }
+
             // Iterate over the first two elements of the array (expected to be id and name, respectively)
             for(int i=0; i < 2; i++){
 
@@ -400,6 +406,37 @@ public class Venue {
         }
 
         return false;
+
+    }
+
+    /**
+     * Public static method used to check if the DEFAULT_VENUE_FILE exists
+     *
+     * @return
+     */
+    public static boolean defaultFileExists()
+    {
+
+        File ticketFile = new File(DEFAULT_VENUE_FILE);
+
+        return ticketFile.exists();
+
+    }
+
+    /**
+     * Static public method used to create a DEFAULT_VENUE_FILE
+     *
+     * @throws IOException
+     */
+    public static void createBlankVenueFile() throws IOException
+    {
+
+        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_VENUE_FILE), false);
+
+        PrintStream output = new PrintStream(file_output_stream);
+
+        // Print to file
+        output.println("\n");
 
     }
 

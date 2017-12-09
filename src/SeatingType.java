@@ -22,7 +22,7 @@ public class SeatingType {
     private String shape;
     private ArrayList<Row> seatMap;
 
-    private static final String DEFAULT_VENUE_FILE = "src/seating_types.csv";
+    private static final String DEFAULT_SEATINGTYPE_FILE = "src/seating_types.csv";
 
     /**
      * Venue constructor that takes a Venue UUID string and name and implicitly reads data from venue file and set object fields
@@ -186,7 +186,7 @@ public class SeatingType {
 
         // Instantiate a File output stream and set the pointer to the end of file in order to append
         // Creates file if it does not exist
-        FileOutputStream file_output_stream = new FileOutputStream(new File(this.DEFAULT_VENUE_FILE), true);
+        FileOutputStream file_output_stream = new FileOutputStream(new File(this.DEFAULT_SEATINGTYPE_FILE), true);
 
         // In order to avoid duplicate records, use id and name as keys and check if they exist in database
         if(!this.checkDuplicateRecord()) {
@@ -214,7 +214,7 @@ public class SeatingType {
     {
 
         // Get input from the File
-        Scanner fileInput = new Scanner(new File(this.DEFAULT_VENUE_FILE));
+        Scanner fileInput = new Scanner(new File(this.DEFAULT_SEATINGTYPE_FILE));
 
         while(fileInput.hasNextLine()){
 
@@ -443,7 +443,7 @@ public class SeatingType {
     {
 
         // Get input from the File
-        Scanner fileInput = new Scanner(new File(this.DEFAULT_VENUE_FILE));
+        Scanner fileInput = new Scanner(new File(this.DEFAULT_SEATINGTYPE_FILE));
 
         while(fileInput.hasNextLine()){
 
@@ -452,6 +452,12 @@ public class SeatingType {
 
             // Explode the Record into individual elements
             String[] recordArray = record.split(",");
+
+            if(recordArray.length <= 1){
+
+                continue;
+
+            }
 
             // Iterate over the first two elements of the array (expected to be id and name, respectively)
             for(int i=0; i < 2; i++){
@@ -485,6 +491,37 @@ public class SeatingType {
         }
 
         return false;
+
+    }
+
+    /**
+     * Public static method used to check if the DEFAULT_SEATINGTYPE_FILE exists
+     *
+     * @return
+     */
+    public static boolean defaultFileExists()
+    {
+
+        File ticketFile = new File(DEFAULT_SEATINGTYPE_FILE);
+
+        return ticketFile.exists();
+
+    }
+
+    /**
+     * Static public method used to create a DEFAULT_SEATINGTYPE_FILE
+     *
+     * @throws IOException
+     */
+    public static void createBlankSeatingTypeFile() throws IOException
+    {
+
+        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_SEATINGTYPE_FILE), false);
+
+        PrintStream output = new PrintStream(file_output_stream);
+
+        // Print to file
+        output.println("\n");
 
     }
 

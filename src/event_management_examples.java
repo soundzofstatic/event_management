@@ -1,7 +1,5 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -42,10 +40,13 @@ public class event_management_examples {
 
         String[] dates = new String[]{"12/31/2017 23:30:00", "03/15/2018 16:30:00", "06/13/2018 18:00:00", "09/04/2018 15:45:00", "10/31/2018 16:00:00", "03/13/2019 21:30:00", "04/14/2018 12:15:00", "07/11/2019 11:00:00"};
 
-        // Create Ticket File
+        // Create Blank Files
         try {
 
-            Ticket.createTicketFile();
+            Event.createBlankEventFile();
+            Venue.createBlankVenueFile();
+            SeatingType.createBlankSeatingTypeFile();
+            Ticket.createBlankTicketFile();
 
         } catch (IOException err){
 
@@ -53,8 +54,10 @@ public class event_management_examples {
 
         }
 
+        // Appends Venue records to the Venue file
         exampleCreateVenue();
 
+        // Appends SeatingType records to the SeatingType file
         exampleCreateSeatingType();
 
         for(int i=0; i < 10; i++){
@@ -65,6 +68,7 @@ public class event_management_examples {
             int artistToUse = r.nextInt((artists.length - 1));
             int datesToUse = r.nextInt((dates.length-1));
 
+            // Appends Event records to the Event file
             new Event("Example Event-" + i, VenueIDs.get(venueIDtoUse), SeatingTypeIDs.get(seatingIDtoUse), 77.77, r.nextInt(100), r.nextInt(900), artists[artistToUse], dates[datesToUse]);
 
         }

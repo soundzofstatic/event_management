@@ -47,6 +47,16 @@ public class app{
     public app()
     {
 
+        // Check if all default files needed to read/write to exist
+        if(!Event.defaultFileExists() || !Venue.defaultFileExists() || !SeatingType.defaultFileExists()){
+
+            System.out.println("One or more of the necessary setup files is missing, producing all files now.");
+
+            // Run class that produces sample files
+            new event_management_examples();
+
+        }
+
         // Reclaim Abandonned Tickets
         try {
             // Cleanup all abandonned Tickets
@@ -1065,7 +1075,7 @@ public class app{
 
             // Notify the User that Checkingout will finalize their order
             // Create a new Panel for the Dialog
-            /*JPanel panel = new JPanel();
+            JPanel panel = new JPanel();
             panel.add(new JLabel("Clicking on Checkout will finalize your Ticket Order. You will not be able to add any more tickets. Would you like to continue or Keep shopping?"));
 
             // The Options for the Option dialog
@@ -1081,9 +1091,9 @@ public class app{
                     null,
                     panelButtons,
                     null
-            );*/
+            );
 
-            //if(checkout == 1) {
+            if(checkout == 1) {
 
 
                 if (shoppingCart.getTixQuantity() > 0) {
@@ -1115,11 +1125,11 @@ public class app{
                 cards.show(containerPanel, "4");
 
 
-            //} else if( checkout < 1) {
+            } else if( checkout < 1) {
                 // User hit escape or No button
                 //Do Nothing
 
-            //}
+            }
 
         }
 

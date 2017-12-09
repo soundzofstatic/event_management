@@ -558,10 +558,29 @@ public class Ticket {
 
     }
 
-    public static void createTicketFile() throws IOException
+    /**
+     * Public static method used to check if the DEFAULT_TICKET_FILE exists
+     *
+     * @return
+     */
+    public static boolean defaultFileExists()
     {
 
-        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_TICKET_FILE), true);
+        File ticketFile = new File(DEFAULT_TICKET_FILE);
+
+        return ticketFile.exists();
+
+    }
+
+    /**
+     * Static public method used to create a DEFAULT_TICKET_FILE
+     *
+     * @throws IOException
+     */
+    public static void createBlankTicketFile() throws IOException
+    {
+
+        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_TICKET_FILE), false);
 
         PrintStream output = new PrintStream(file_output_stream);
 

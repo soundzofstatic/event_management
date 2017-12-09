@@ -453,6 +453,12 @@ public class Event {
             // Explode the Record into individual elements
             String[] recordArray = record.split(",");
 
+            if(recordArray.length <= 1){
+
+                continue;
+
+            }
+
             // Iterate over the first two elements of the array (expected to be id and name, respectively)
             for(int i=0; i < 1; i++){
 
@@ -580,12 +586,49 @@ public class Event {
             // Read record line and explode it via ","
             String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
+            if(recordArray.length <= 1){
+
+                continue;
+
+            }
+
             // Get an Object for the event with id recordArray[0]
             eventList.add(new Event(recordArray[0], null));
 
         }
 
         return eventList;
+
+    }
+
+    /**
+     * Public static method used to check if the DEFAULT_EVENT_FILE exists
+     *
+     * @return
+     */
+    public static boolean defaultFileExists()
+    {
+
+        File ticketFile = new File(DEFAULT_EVENT_FILE);
+
+        return ticketFile.exists();
+
+    }
+
+    /**
+     * Static public method used to create a DEFAULT_EVENT_FILE
+     *
+     * @throws IOException
+     */
+    public static void createBlankEventFile() throws IOException
+    {
+
+        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_EVENT_FILE), false);
+
+        PrintStream output = new PrintStream(file_output_stream);
+
+        // Print to file
+        output.println("\n");
 
     }
 
