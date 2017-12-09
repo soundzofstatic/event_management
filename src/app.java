@@ -230,6 +230,7 @@ public class app{
         int panelWidth = 350;
         int panelHeight = 200;
 
+        //new JPanel, dimensions, and color
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
         panel.setBackground(Color.BLUE);
@@ -278,6 +279,7 @@ public class app{
         twoButtons.add(buildViewCartButton());
         twoButtons.add(buildCheckoutButton());
 
+        //Add totalTextArea, twoButtons to panel
         panel.add(totalTextArea);
         panel.add(twoButtons);
 
@@ -393,11 +395,11 @@ public class app{
         venueDetailsTextArea.setOpaque(false);
         venueDetailsTextArea.setEditable(false);
 
-        //
+        //new JPanel
         JPanel eventDetailPanel = new JPanel();
         eventDetailPanel.setPreferredSize(new Dimension(panelWidth, panelHeight));
 
-        // Add it to this local panel
+        // Add eventDetailsTextArea, venueDetailsTextArea to eventDetailPanel
         eventDetailPanel.add(eventDetailsTextArea);
         eventDetailPanel.add(venueDetailsTextArea);
 
@@ -549,10 +551,11 @@ public class app{
         totalTextArea.setOpaque(false);
         totalTextArea.setEditable(false);
 
+        //Add quantityLabel, totalTextArea to quantityPanel
         quantityPanel.add(quantityLabel);
         quantityPanel.add(totalTextArea);
 
-
+        //Add cartWord, cartListScrollPane, quantityPanel, buildStandardButtonPanel, to panel
         panel.add(cartWord);
         panel.add(cartListScrollPane);
         panel.add(quantityPanel);
@@ -648,21 +651,25 @@ public class app{
         totalTextArea.setOpaque(false);
         totalTextArea.setEditable(false);
 
+        //new JLabel
         JLabel thanksLabel = new JLabel("Thank you for using Ticketmaster 2.0: Optimized");
         thanksLabel.setPreferredSize(new Dimension((panelWidth), 25));
         thanksLabel.setMinimumSize(new Dimension((panelWidth), 25));
 
+        //new JPanel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setPreferredSize(new Dimension(panelWidth, 100));
         buttonPanel.setMinimumSize(new Dimension(panelWidth, 100));
 
+        //Add buildCloseButton to buttonPanel
         buttonPanel.add(buildCloseButton());
 
+        //Add quantityLabel, totalTextArea, thanksLabel to quantityPanel
         quantityPanel.add(quantityLabel);
         quantityPanel.add(totalTextArea);
         quantityPanel.add(thanksLabel);
 
-
+        //Add cartWord, cartListScrollPane, quantityPanel, buttonPanel to panel
         panel.add(cartWord);
         panel.add(cartListScrollPane);
         panel.add(quantityPanel);
@@ -717,6 +724,7 @@ public class app{
     private JButton buildViewCartButton()
     {
 
+        //View Cart Button
         JButton cartButton = new JButton("View Cart");
         cartButton.addActionListener(new cartViewListener());
 
@@ -815,6 +823,10 @@ public class app{
 
     }
 
+    /**
+     * ListCellRender cartListCellRenderer, which allows the use of objects within the list,
+     * but displays a human readable list item
+     */
     private class cartListCellRenderer implements ListCellRenderer{
 
         protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
@@ -949,11 +961,14 @@ public class app{
 
             if (!e.getValueIsAdjusting()){
 
+                //new JPanel
                 JPanel panel = new JPanel();
                 panel.add(new JLabel("Would you like to remove this item from your cart?"));
 
+                //Instantiate panelButtons
                 Object[] panelButtons = {"No", "Yes"};
 
+                //Instantiate removeCartItem
                 int removeCartItem = JOptionPane.showOptionDialog(
                         null,
                         panel,
