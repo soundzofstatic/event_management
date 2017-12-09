@@ -1,13 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
 /**
  * DESCRIPTION
  *
- * @author Scott Chaplinksi
- * @author Daniel Paz
- * @author Clarissa Dean
+ *
+ *
  * @version 1.0
  */
 public class Ticket {
@@ -444,6 +444,12 @@ public class Ticket {
             // Read record line and explode it via ","
             String[] recordArray = Utility.explode(fileInput.nextLine(), ",");
 
+            if(recordArray.length <= 1){
+
+                continue;
+
+            }
+
             // Skip records that don't have matching id
             if(eventID != null && recordArray[3].toLowerCase().equals(eventID.toLowerCase())) {
 
@@ -476,6 +482,12 @@ public class Ticket {
 
             // Read record line and explode it via ","
             String[] recordArray = Utility.explode(line, ",");
+
+            if(recordArray.length <= 1){
+
+                continue;
+
+            }
 
             // Only keep records that are marked sold
             if(recordArray[1].toLowerCase().equals("sold")) {
@@ -543,6 +555,18 @@ public class Ticket {
 
         // Close the file output stream
         file_output_stream.close();
+
+    }
+
+    public static void createTicketFile() throws IOException
+    {
+
+        FileOutputStream file_output_stream = new FileOutputStream(new File(DEFAULT_TICKET_FILE), true);
+
+        PrintStream output = new PrintStream(file_output_stream);
+
+        // Print to file
+        output.println("\n");
 
     }
 
