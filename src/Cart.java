@@ -11,28 +11,25 @@ import java.util.Date;
  * @author Clarissa Dean
  * @version 1.0
  */
- 
- /*
- NEEDED: - Checkout method needs to write to a transactions.csv (see createRecord() method Event, Venue or SeatingType) file that keeps track of an order’s:
-			- transactionID/cartID
-			- # of tickets ordered
-			- Subtotal of order
-			- Tax for order (if needed)
-			- date of transaction (you can use the static method added into the Utility class)
-			- epoch of transaction (you can use the static method added into the Utility class)
- */
 
 public class Cart{
 
 	private ArrayList<Ticket> tixList;
 	private String id;
 	private double subtotal = 0.0;
+	private double taxRate = 0.07;
+	private double tax = 0.0;
+	private double total = 0.0;
+	private int tixQuantity = 0;
 	private Date date = new Date();
 	
 	private static final String DEFAULT_TRANSACTIONS_FILE = "src/transactions.csv";
 
-	public Cart()
-	{
+	/**
+     * Cart constructor that implicitly sets the Cart ID
+     *
+     */
+	public Cart(){
 
 		this.tixList = new ArrayList<Ticket>();
 		UUID uuid = UUID.randomUUID();
@@ -42,90 +39,147 @@ public class Cart{
 
 	}
 
-	public ArrayList<Ticket> getTixList()
-	{
+	
+	/**
+     * Public Getter method that returns the value of this.tixList
+     *
+     * @return ArrayList
+     */
+	public ArrayList<Ticket> getTixList(){
 
 		return this.tixList;
 
 	}
+	
+	
+	/**
+     * Public Getter method that returns the value of this.subtotal
+     *
+     * @return 
+     */
+	public double getSubtotal(){
+		return this.subtotal;
+	}
+	
+	
+	/**
+     * Public Getter method that returns the value of this.tax
+     *
+     * @return
+     */
+	public double getTax(){
+		return this.tax;
+	}
+	
+	
+	/**
+     * Public Getter method that returns the value of this.total
+     *
+     * @return
+     */
+	public double getTotal(){
+		return this.total;
+	}
+	
+	
+	/**
+     * Public Getter method that returns the value of this.tixQuantity
+     *
+     * @return
+     */
+	public int getTixQuantity(){
+		return this.tixQuantity;
+	}
+	
 
-	public void setTixList(ArrayList<Ticket> newTixList)
-	{
+	/**
+     * Public Setter method that sets the value of this.tixList
+     *
+     * @param newTixList
+     */
+	public void setTixList(ArrayList<Ticket> newTixList){
 
 		this.tixList = newTixList;
 
 	}
 
-	public Boolean add(Ticket newTicket)
-	{
-
-		Boolean addSuccess = false;
+	
+	/**
+     * Public method that adds a new ticket to this.tixList, recalculates the subtotal, tax, and total of the cart, and returns a boolean denoting whether the addition was successful or not.
+     *
+     * @param newTicket
+	 * @return 
+     */
+	public boolean add(Ticket newTicket){
+		boolean addSuccess = false;
+		Scanner console = new Scanner(System.in);
 		
-		for (int i = 0; i < this.tixList.size(); i++) {
-
-			if (tixList.get(i).getId().equals(newTicket.getId())){
-
-				return addSuccess;
-
+		while (int i = 0; i < tixList.length(); i++){
+			if (this.tixList.get(i).getId() == newTicket.getId()){
+			return addSuccess;
 			}
-
 		}
 		
 		this.tixList.add(newTicket);
-
-		this.subtotal += newTicket.getPrice();
-
+		calculateTotal(newTicket.getPrice(), true);
+		this.tixQuantity++
 		addSuccess = true;
-
 		return addSuccess;
-
 	}
 
-	public Boolean remove(int ticketIndex)
-	{
+	
+	/**
+     * Public method that removes a ticket by ID from this.tixList (if it exists within the list), recalculates the subtotal, tax, and total of the cart, and returns a boolean denoting whether the removal was successful or not.
+     *
+     * @param ticketId
+	 * @return 
+     */
+	public boolean remove(String ticketId){
 
-		Boolean removeSuccess = false;
+		Scanner console = new Scanner(System.in);
+		boolean removeSuccess = false;
 
-		if (ticketIndex < 0 || ticketIndex >= this.tixList.size()){
-
+		if (ticketId == null){
 			return removeSuccess;
-
 		}
-
-		this.subtotal -= this.tixList.get(ticketIndex).getPrice();
-
-		this.tixList.remove(ticketIndex);
-
-		removeSuccess = true;
-
+		
+		for (int i = 0; i < tixList.length(); i++){
+			if (this.tixList.get(i).getId().toLowerCase() == ticketId.toLowerCase()){
+				calculateTotal(this.tixList.get(ticketIndex).getPrice(), false)
+				this.tixList.remove(ticketIndex);
+				this.tixQuantity--
+				removeSuccess = true;
+				return removeSuccess;
+			}
+		}
+		
 		return removeSuccess;
-
 	}
+	
 
-
-	public String toString()
-	{
-
+	/**
+     * @return String
+     */
+	public String toString(){
 		String cartString = "Tickets in Cart: \n";
-		double tax;
-		double total;
-		for (int i = 0; i < this.tixList.size(); i++){
-			cartString += (tixList.get(i).getId() + "\n");
-			this.subtotal += (tixList.get(i).getPrice());
+		for (int i = 0; i < this.tixList.length(); i++){
+			cartString += (this.tixList.get(i).getId() + "\n");
+			this.subtotal += (this.tixList.get(i).getPrice());
 		}
-		tax = this.subtotal * .07;
-		total = this.subtotal + tax;
-		cartString += "********************\n";
-		cartString += "Subtotal: $" + String.format("%.2f", this.subtotal);
-		cartString +=  "\n7% Tax: $" + String.format("%.2f", tax);
-		cartString += "\nTotal: $" + String.format("%.2f", total);
-
+		cartString += ((20 * "-") + "\nSubtotal: $" + String.format("%.2f", this.subtotal)) +
+				("\n7% Tax: $" + String.format("%.2f", this.tax)) +
+				("\nTotal: $" + String.format("%.2f", this.total));
 		return cartString;
 	}
 
 
-	public Boolean checkout(){
-		Boolean checkoutSuccess = false;
+	/**
+     * Public method that checks the cart out, adding the cart's data to the transactions.csv file and updating the status of the tickets to sold. Returns a boolean denoting if the checkout was successful or not.
+     * 
+	 * @return 
+     */
+	public boolean checkout(){
+		boolean checkoutSuccess = false;
 		
 		try {
 			createRecord();
@@ -134,21 +188,45 @@ public class Cart{
 			return checkoutSuccess;
 		}
 		
-		for (int i = 0; i < this.tixList.size(); i++){
-
-			this.tixList.get(i).setPurchased(true);
-
+		for (int i = 0; i < this.tixList.length(); i++){
+			this.tixlist.get(i).setPurchased(true);
 		}
 		
 		checkoutSuccess = true;
-
 		return checkoutSuccess;
 		
 	}
 	
+	
+	/**
+     * Helper method that recalculates the subtotal, tax amount, and total price of the cart's contents, modifying their respective variables with the new amounts. Can both add to and subtract from the subtotal, based on a boolean.
+     * 
+	 * @param amountChanged
+	 * @param isAddition
+     */
+	private void calculateTotal(double amountChanged, boolean isAddition){
+		
+		if(isAddition){
+			this.subtotal += amountChanged;
+		}
+		else{
+			this.subtotal -= amountChanged;
+		}
+		
+		this.tax = this.subtotal * this.taxRate;
+		this.total = this.subtotal + this.tax;
+		
+	}
+	
+	
+	/**
+     * Private method used to write object fields to a transactions.csv file.
+     *
+     * @throws FileNotFoundException
+     */
 	private void createRecord() throws FileNotFoundException
     {
-        String record = "\"" + this.id + "\",\"" + (this.tixList.size() - 1) + "\",\"" + String.format("%.2f", this.subtotal) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + Utility.convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
+        String record = "\"" + this.id + "\",\"" + this.tixList.length + "\",\"" + String.format("%.2f", this.subtotal)) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
 
         FileOutputStream file_output_stream = new FileOutputStream(new File(this.DEFAULT_TRANSACTIONS_FILE), true);
 
@@ -166,6 +244,14 @@ public class Cart{
 
     }
 	
+	
+	/**
+     * Helper method used to check for duplicate records in our "database" file.
+     * Uses cart id as unique key
+     *
+     * @return
+     * @throws FileNotFoundException
+     */
 	private boolean checkDuplicateRecord() throws FileNotFoundException
     {
 
