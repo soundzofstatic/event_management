@@ -227,7 +227,7 @@ public class Cart{
 	 */
 	private void createRecord() throws FileNotFoundException
 	{
-		String record = "\"" + this.id + "\",\"" + this.tixList.size() + "\",\"" + String.format("%.2f", this.subtotal)) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + Utility.convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
+		String record = "\"" + this.id + "\",\"" + this.tixList.size() + "\",\"" + String.format("%.2f", this.subtotal) + "\",\"" + String.format("%.2f", (this.subtotal*.07)) + "\",\"" + Utility.convertEpochToDatestamp(this.date.getTime()) + "\",\"" + this.date.getTime() + "\"";
 
 		FileOutputStream file_output_stream = new FileOutputStream(new File(this.DEFAULT_TRANSACTIONS_FILE), true);
 
