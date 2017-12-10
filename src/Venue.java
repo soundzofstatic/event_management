@@ -23,7 +23,7 @@ public class Venue {
     private int capacity;
     private int[] typeOfSeating;
 
-    private static final String DEFAULT_VENUE_FILE =  System.getProperty("user.dir") + "/src/venues.csv";
+    private static final String DEFAULT_VENUE_FILE =  System.getProperty("user.dir") + "/venues.csv";
 
     /**
      * Venue constructor that takes a Venue UUID string and name and implicitly reads data from venue file and set object fields

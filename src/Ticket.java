@@ -21,7 +21,7 @@ public class Ticket {
     private String status;
     private boolean purchased;
 
-    private static final String DEFAULT_TICKET_FILE =  System.getProperty("user.dir") + "/src/tickets.csv";
+    private static final String DEFAULT_TICKET_FILE =  System.getProperty("user.dir") + "/tickets.csv";
 
     /**
      * Ticket constructor used to accept client code definitions for a venue and implicitly writes data to a file

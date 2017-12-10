@@ -35,7 +35,7 @@ public class Event {
     private long timestamp;
     private boolean active;
 
-    private static final String DEFAULT_EVENT_FILE =  System.getProperty("user.dir") + "/src/events.csv";
+    private static final String DEFAULT_EVENT_FILE =  System.getProperty("user.dir") + "/events.csv";
 
     /**
      * Event constructor that takes a Event UUID string and name and implicitly reads data from event file and set object fields

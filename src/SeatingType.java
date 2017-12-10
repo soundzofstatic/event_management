@@ -22,7 +22,7 @@ public class SeatingType {
     private String shape;
     private ArrayList<Row> seatMap;
 
-    private static final String DEFAULT_SEATINGTYPE_FILE = System.getProperty("user.dir") + "/src/seating_types.csv";
+    private static final String DEFAULT_SEATINGTYPE_FILE = System.getProperty("user.dir") + "/seating_types.csv";
 
     /**
      * Venue constructor that takes a Venue UUID string and name and implicitly reads data from venue file and set object fields
