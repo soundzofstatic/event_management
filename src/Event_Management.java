@@ -19,7 +19,7 @@ import java.io.IOException;
  * @author Scott Chaplinksi
  * @author Clarissa Dean
  */
-public class app{
+public class Event_Management{
 
     final int WINDOW_WIDTH = 800;
     final int WINDOW_HEIGHT = 600;
@@ -37,14 +37,14 @@ public class app{
     public static void main(String[] args)
     {
 
-        new app();
+        new Event_Management();
 
     }
 
     /**
      * Constructor used to deploy App
      */
-    public app()
+    public Event_Management()
     {
 
         // Check if all default files needed to read/write to exist
@@ -182,12 +182,24 @@ public class app{
         try {
 
             // new JList
-            JList eventList = new JList(Event.eventsList().toArray());
-            ListCellRenderer eventListRenderer = new eventListCellRenderer();
+            //JList<Object> eventList = new JList<>(Event.eventsList().toArray());
+            JList<Object> eventList = new JList<>();
+
+            DefaultListModel<Object> listModel = new DefaultListModel<>();
+            for(Object event : Event.eventsList().toArray()){
+
+                listModel.addElement(event);
+
+            }
+
+            eventList.setModel(listModel);
+
+
+
             eventList.setPreferredSize(new Dimension(panelWidth, (panelHeight - 25)));
 
             // Add Renderer to seatList
-            eventList.setCellRenderer(eventListRenderer);
+            //eventList.setCellRenderer(new eventListCellRenderer());
 
             // Add Event Listener
             eventList.addListSelectionListener(new eventListListener());
@@ -448,12 +460,22 @@ public class app{
         System.out.println(focusedEvent.getSeatsSold().toString());
 
         // new JList
-        JList seatList = new JList(focusedEvent.getSeatsAvailable().toArray());
-        ListCellRenderer seatRenderer = new focusedSeatCellRenderer();
+        //JList<Object> seatList = new JList<Object>(focusedEvent.getSeatsAvailable().toArray());
+        JList<Object> seatList = new JList<>(focusedEvent.getSeatsAvailable().toArray());
+        //ListCellRenderer seatRenderer = new focusedSeatCellRenderer();
         seatList.setPreferredSize(new Dimension(panelWidth, (panelHeight - 25)));
 
+        DefaultListModel<Object> listModel = new DefaultListModel<>();
+        for(Object event : focusedEvent.getSeatsAvailable().toArray()){
+
+            listModel.addElement(event);
+
+        }
+
+        seatList.setModel(listModel);
+
         // Add Renderer to seatList
-        seatList.setCellRenderer(seatRenderer);
+        //seatList.setCellRenderer(seatRenderer);
 
         // Add Event Listener
         seatList.addListSelectionListener(new seatListListener());
@@ -524,13 +546,22 @@ public class app{
         cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-50)));
 
         //new JList
-        JList cartList = new JList(shoppingCart.getTixList().toArray());
-        ListCellRenderer cartListRenderer = new cartListCellRenderer();
+        JList<Object> cartList = new JList<>();
+        //ListCellRenderer cartListRenderer = new cartListCellRenderer();
         cartList.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
         cartList.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
 
+        DefaultListModel<Object> listModel = new DefaultListModel<>();
+        for(Object event : shoppingCart.getTixList().toArray()){
+
+            listModel.addElement(event);
+
+        }
+
+        cartList.setModel(listModel);
+
         //set defined renderer to cart
-        cartList.setCellRenderer(cartListRenderer);
+        //cartList.setCellRenderer(cartListRenderer);
 
         //add event listener
         cartList.addListSelectionListener(new cartListListener());
@@ -624,13 +655,22 @@ public class app{
         cartListScrollPane.setMinimumSize(new Dimension(panelWidth, (panelHeight-50)));
 
 
-        JList cartList = new JList(shoppingCart.getTixList().toArray());
-        ListCellRenderer cartListRenderer = new cartListCellRenderer();
+        JList<Object> cartList = new JList<>();
+        //ListCellRenderer cartListRenderer = new cartListCellRenderer();
         cartList.setPreferredSize(new Dimension(panelWidth, (panelHeight-25)));
         cartList.setMinimumSize(new Dimension(panelWidth, (panelHeight-25)));
 
+        DefaultListModel<Object> listModel = new DefaultListModel<>();
+        for(Object event : shoppingCart.getTixList().toArray()){
+
+            listModel.addElement(event);
+
+        }
+
+        cartList.setModel(listModel);
+
         //set defined renderer to cart
-        cartList.setCellRenderer(cartListRenderer);
+        //cartList.setCellRenderer(cartListRenderer);
 
         //add event listener
         cartList.addListSelectionListener(new cartListListener());
@@ -878,7 +918,7 @@ public class app{
     /**
      * ListSelectionListener for lists invoking the seatListListener
      */
-    private class seatListListener implements ListSelectionListener{
+    private class seatListListener implements ListSelectionListener {
 
         public void valueChanged(ListSelectionEvent e)
         {
@@ -1147,3 +1187,4 @@ public class app{
     }
 
 }
+

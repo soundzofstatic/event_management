@@ -25,7 +25,7 @@ public class Cart{
 	private int tixQuantity = 0;
 	private Date date = new Date();
 
-	private static final String DEFAULT_TRANSACTIONS_FILE = "src/transactions.csv";
+	private static final String DEFAULT_TRANSACTIONS_FILE =  System.getProperty("user.dir") + "/src/transactions.csv";
 
 	/**
 	 * Cart constructor that implicitly sets the Cart ID

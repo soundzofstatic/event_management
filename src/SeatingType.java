@@ -22,7 +22,7 @@ public class SeatingType {
     private String shape;
     private ArrayList<Row> seatMap;
 
-    private static final String DEFAULT_SEATINGTYPE_FILE = "src/seating_types.csv";
+    private static final String DEFAULT_SEATINGTYPE_FILE = System.getProperty("user.dir") + "/src/seating_types.csv";
 
     /**
      * Venue constructor that takes a Venue UUID string and name and implicitly reads data from venue file and set object fields
@@ -355,13 +355,13 @@ public class SeatingType {
     {
 
         // Initialize a general ArrayList to be used to keep Rows in String Array format
-        ArrayList dynamicRowArray = new ArrayList();
+        ArrayList<String> dynamicRowArray = new ArrayList<>();
 
         // Iterate over each Row in seatLayout
         for(int i = 0; i < seatLayout.size(); i++){
 
             // Initialize general ArrayList to be used to keep Seats in String Array format
-            ArrayList dynamicSeatArray = new ArrayList();
+            ArrayList<String[]> dynamicSeatArray = new ArrayList<>();
 
             // Get the Current row as an object of type Row
             Row currentRow = seatLayout.get(i);
